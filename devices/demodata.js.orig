@@ -1,0 +1,47 @@
+<<<<<<< Updated upstream
+var db = require('any-db');
+var dbURL = 'postgres://postgres:admin@localhost:5432/transretail';
+var conn = db.createConnection(dbURL);
+var sql = 'SELECT ean13code FROM PRODUCT';
+var barcodes = [ { ean13code: '4974052854569' },
+                 { ean13code: '8851295511021' },
+                 { ean13code: '4902505088834' },
+                 { ean13code: '4902505088919' },
+                 { ean13code: '4902505088827' },
+                 { ean13code: '4902505088728' },
+                 { ean13code: '4902505088612' },
+                 { ean13code: '4902505088537' },
+                 { ean13code: '4902505088445' },
+                 { ean13code: '4902505088315' } ];
+conn.query(sql, function (error, result) {
+	console.log(result.rows);
+	barcodes = result.rows;
+});
+
+=======
+//var db = require('any-db');
+//var dbURL = 'postgres://postgres:admin@localhost:5432/transretail';
+//var conn = db.createConnection(dbURL);
+//var sql = "SELECT ean13code FROM PRODUCT"; //all items
+var sql = "SELECT ean13code FROM PRODUCT WHERE NOT category_id IN ('GC','XWarranty')"; //NOT gift card
+//var sql = "SELECT ean13code FROM PRODUCT WHERE department_code = '20'"; //fresh goods items
+//var sql = "select * from product where ean13code in ('8851295555101','8851295555102','8851295555106','4974052854569','4902505088612')"; //auto markdown items
+var barcodes;
+/*conn.query(sql, function (error, result) {
+	barcodes = result.rows;
+	console.log(barcodes);
+});*/
+var barcodes = [ { ean13code: '4974052854569' },
+                 { ean13code: '8851295511021' },
+                 { ean13code: '4902505088834' },
+                 { ean13code: '4902505088919' },
+                // { ean13code: '4902505088827' },
+                 { ean13code: '4902505088728' },
+                 { ean13code: '4902505088612' },
+                 { ean13code: '4902505088537' },
+                 { ean13code: '4902505088445' },
+                 { ean13code: '4902505088315' } ];
+>>>>>>> Stashed changes
+exports.getBarcode = function() {
+	return barcodes[Math.floor(Math.random()*barcodes.length)].ean13code;
+};

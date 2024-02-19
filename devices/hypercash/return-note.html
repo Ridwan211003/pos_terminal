@@ -1,0 +1,268 @@
+<html xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+	<meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+	<style>
+		#tdReturnNoteNo {
+			font-size: 12.5pt;			
+			padding: 59.5pt 10pt 0pt 160pt;
+			text-align: center;
+			width: 100%;
+		}
+
+		#hcTaxInvNo {
+			font-size: 12.5pt;
+			padding: 10pt 0pt 0pt 130pt;
+			text-align: left;
+			width: 55%;
+		}
+
+		#tdTxnDate {
+			font-size: 12.5pt;
+			padding: 10pt 0pt 0pt 165pt;
+			width: 30%;
+		}
+
+		#hcTxId {
+			font-size: 12.5pt;
+			padding: 0pt 0pt 18pt 130pt;
+		}
+
+		.buyerSellerInfo {
+			font-size: 12.5pt;
+			padding: 0pt 0pt 0pt 171pt;
+		}
+
+		td {
+			line-height: 1;
+		}
+
+		table.return-note-details {
+			margin-left: 38pt;
+			width: 1020px;
+		}
+
+		table.item-list {
+			font-size: 14.5pt;
+			width: 1020px;
+			margin-left: 75px;
+		}
+
+		td.itemNo {
+			/*overflow: hidden;*/
+			text-align: center;
+			width: 45px;
+		}
+
+		td.itemDesc {
+			padding-left: 20pt;
+			width: 635px;
+		}
+
+		td.itemQty {
+			text-align: center;
+			width: 55px;
+		}
+
+		td.itemPrice {
+			text-align: right;
+			width: 140px;
+			padding-right: 5px;
+		}
+
+		td.itemSellingPrice {
+			text-align: right;
+			width: 145px;
+			padding-right: 5px;
+		}
+
+		div#sHarga {
+			margin-left: 40pt;
+			padding-left: 0pt; 
+			padding-top: 10pt; 
+			width: 1020px; 
+		}
+
+		div#hcFooter {
+			bottom: 10pt;
+			font-size: 13pt;
+			margin-left: 50pt;
+			width: 800pt;
+		}
+
+		.asterisk {
+			font-size: 10pt;
+		}
+	</style>
+</head>
+
+<body bgcolor=white>
+
+<div style="background-size: 100% auto; padding-right: 10px;">
+<div style="position: absolute;">
+<table class="return-note-details">
+	<tr>
+		<!-- Nomor / Sequential 10 digits / RETURN_NOTE_NO -->
+		<td colspan="2" id="tdReturnNoteNo"><span id="hcReturnNoteNo"></span></td>
+	</tr>
+	<tr>
+		<!-- Atas Faktur Pajak No. / Tax Invoice No. -->
+		<td id="hcTaxInvNo"></td>
+		<!-- Tanggal / Date -->
+		<td id="tdTxnDate">
+			<span id='hcTxnDate'></span>
+		</td>
+	</tr>
+	<tr>
+		<!-- Nomor / Transaction ID -->
+		<td id="hcTxId"></td>
+	</tr>
+	<tr>
+		<!-- Pembeli BKP Nama -->
+		<td id='hcBuyerName' class="buyerSellerInfo" colspan="2"></td>
+	</tr>
+	<tr>
+		<!-- Pembeli BKP Alamat -->
+		<td id='hcBuyerTaxAddr' class="buyerSellerInfo" colspan="2"></td>
+	</tr>
+	<tr>
+		<!-- Pembeli BKP NPWP -->
+		<td id='hcBuyerNpwp' class="buyerSellerInfo" colspan="2"></td>
+	</tr>
+	<tr>
+		<!-- Space between Pembeli BKP and Kepada Penjual -->
+		<td style="padding-top: 16pt;" colspan="2"></td>
+	</tr>
+	<tr>
+		<!-- Kepada Penjual Nama -->
+		<td id='hcSellerName' class="buyerSellerInfo" colspan="2"></td>
+	</tr>
+	<tr>
+		<!-- Kepada Penjual Alamat -->
+		<td id='hcSellerAddr' class="buyerSellerInfo" colspan="2"></td>
+	</tr>
+	<tr>
+		<!-- Kepada Penjual Telepon -->
+		<td id='hcSellerTelepon' class="buyerSellerInfo" colspan="2"></td>
+	</tr>
+	<tr>
+		<!-- Kepada Penjual NPWP -->
+		<td id='hcSellerNpwp' class="buyerSellerInfo" colspan="2"></td>
+	</tr>
+</table>
+
+<div style="padding-top: 60pt;"/>
+
+<table class="item-list" cellpadding="0" cellspacing="0">
+	<tr id='hcTotalsSummary'></tr>
+<!--Test Data only 	
+	<tr>
+		<td class="itemNo">1</td>
+		<td class="itemDesc">Milk Powder</td>
+		<td class="itemQty">1</td>
+		<td class="itemPrice">10200</td>
+		<td class="itemSellingPrice">10200</td>
+	</tr> -->
+	<tr>
+		<td class="itemNo"></td>
+		<td class="itemDesc">Biaya Non member *</td>
+		<td class="itemQty"></td>
+		<td class="itemPrice"></td>
+		<td id="nonMemberMarkup" class="itemSellingPrice"></td>
+	</tr>
+</table>
+
+<div style="padding-top: 370pt;" />
+
+<table class="item-list">
+	<tr>
+		<td class="itemNo"></td>
+		<td class="itemDesc">Jumlah Harga Jual BKP yang dikembalikan</td>
+		<td class="itemQty"></td>
+		<td class="itemPrice"></td>
+		<td id="hcTotalSellingPrice" class="itemSellingPrice"></td>
+	</tr>
+	<tr>
+		<td class="itemNo"></td>
+		<td class="itemDesc">Potongan Harga BKP yang dikembalikan</td>
+		<td class="itemQty"></td>
+		<td class="itemPrice"></td>
+		<td id="hcDiscount" class="itemSellingPrice"></td>
+	</tr>
+	<tr>
+		<td class="itemNo"></td>
+		<td class="itemDesc">Total Harga Jual BKP setelah Potongan Harga yang dikembalikan</td>
+		<td class="itemQty"></td>
+		<td class="itemPrice"></td>
+		<td id="hcSubTotal" class="itemSellingPrice"></td>
+	</tr>
+	<tr>
+		<td class="itemNo"></td>
+		<td class="itemDesc">PPN yang diminta kembali</td>
+		<td class="itemQty"></td>
+		<td class="itemPrice"></td>
+		<td id="hcTotalVat" class="itemSellingPrice" style="border-bottom: 1px solid black;"></td>
+	</tr>
+	<tr>
+		<td class="itemNo"></td>
+		<td class="itemDesc">Total yang harus dikembalikan</td>
+		<td class="itemQty"></td>
+		<td class="itemPrice"></td>
+		<td id="hcTotalAmt" class="itemSellingPrice"></td>
+	</tr>
+	<tr>
+		<td class="itemNo"></td>
+		<td class="itemDesc">PPnBM yang diminta kembali</td>
+		<td class="itemQty"></td>
+		<td class="itemPrice"></td>
+		<td id="hcPpnBm" class="itemSellingPrice"></td>
+	</tr> 
+</table>
+
+<div id="sHarga">
+	<table style="font-size: 13pt; width: 100%;">
+		<tr>
+			<td class="itemNo"></td>
+			<td style="width: 30%;"></td>
+			<td align="center">HARGA</td>
+			<td align="center">PPN</td>
+			<td align="center">TOTAL HARGA</td>
+			<td class="itemQty"></td>
+			<td class="itemPrice"></td>
+			<td class="itemSellingPrice"></td>
+		</tr>
+		<tr>
+			<td class="itemNo"></td>
+			<td style="width: 30%; padding-left: 30pt;">Barang & Jasa Kena Pajak*</td>
+			<td id='sumSellingPriceTaxable' align="center"></td>
+			<td id='sumPPN' align="center"></td>
+			<td id='sumSellingPricePlusTax' align="center"></td>
+			<td class="itemQty"></td>
+			<td class="itemPrice"></td>
+			<td class="itemSellingPrice"></td>
+		</tr>
+		<tr>
+			<td class="itemNo"></td>
+			<td style="width: 30%; padding-left: 30pt;">Bukan barang kena pajak</td>
+			<td id='sumSellingPriceNonTaxable1' align="center"></td>
+			<td align="center"></td>
+			<td id='sumSellingPriceNonTaxable2' align="center"></td>
+			<td class="itemQty"></td>
+			<td class="itemPrice"></td>
+			<td class="itemSellingPrice"></td>
+		</tr>
+	</table>
+</div>
+</div>
+</div>
+
+<div id="hcFooter">
+	<div style="padding-top: 70pt; margin-left: 590pt;">
+		<span id="hcStoreLocation">Bekasi</span>,
+		<span id="hcReturnDate">23 May 2014</span>
+	</div>
+	<div id="hcCustomerName" style="padding-top: 20pt; margin-left: 590pt;">Juan Dela Cruz</div>
+</div>
+
+</body>
+</html>

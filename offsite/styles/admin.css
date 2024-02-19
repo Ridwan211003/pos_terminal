@@ -1,0 +1,416 @@
+@charset "UTF-8";
+/* CSS Document */
+@font-face {
+    font-family: 'Avenir';
+    src: url('fonts/12_avenir_55_roman_05173-webfont.eot');
+    src: url('fonts/12_avenir_55_roman_05173-webfont.eot?iefix') format('eot'),
+         url('fonts/12_avenir_55_roman_05173-webfont.woff') format('woff'),
+         url('fonts/12_avenir_55_roman_05173-webfont.ttf') format('truetype'),
+         url('fonts/12_avenir_55_roman_05173-webfont.svg#webfontjSpbZQRv') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+body {
+	font-family: 'Avenir';
+	font: 100%/1.0;
+	background-color: #e4e5e7;
+	margin: 0;
+	padding: 0;
+	color: #000;
+}
+
+
+ul, ol, dl {
+	padding: 0;
+	margin: 0;
+}
+h1, h4, h5, h6, p {
+	margin-top: 0;	
+	padding-right: 15px;
+	padding-left: 15px;
+}
+
+h3{
+	margin-top: 0;	
+	padding-right: 15px;
+	color: #005CA6;
+	line-height: 5px;
+	font-weight: normal;
+}
+
+p {
+	font-size: .8em;
+	
+	}
+	
+.whiteFont {
+	color: #504b47;
+	font-size:.9em;
+	padding: 0px 20px;
+	}
+
+h2{
+	margin-top: 0;	
+	padding-right: 15px;
+	padding-left: 15px;
+	color: #fff;
+}
+
+.padTop{
+	padding-top: 20px;
+}
+
+.blackFont {
+	color: gray;
+}
+
+a img {
+	border: none;
+}
+
+
+a:link {
+	color:#1b4c9b;
+	text-decoration: underline; 
+
+}
+a:visited {
+	color: #4E5869;
+	text-decoration: underline;
+}
+a:hover, a:active, a:focus {
+	text-decoration: none;
+}
+
+.container {
+	width: 100%;
+	max-width: 2000px;
+	min-width: 600px;
+	background-color: #dddee2;
+	margin: 0 auto;
+}
+.header {
+	background-color: white;
+	height: 20%;
+}
+
+.sidebar1 {
+	float: left;
+	width: 18%;
+	background-color: #dddee2;
+	padding: 0 10px;
+	height: 100%;
+
+}
+.contentHeader {
+	padding: 1% 0 2% 10%;
+	width: 79%;
+	margin-left: 10%
+	
+}
+
+.contentCenter {
+	padding: 0; 
+	
+	
+}
+
+.mainContent {
+	background: white;
+	border: 1px solid #999999;
+	
+   	
+}
+
+.mainContentBox{
+	background: #ececee;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 1px 1px 3px 1px #888888;
+	
+}
+
+.titleBG {
+	background: -moz-linear-gradient(top, #fdfdfd 0%, #dbdbdb 50%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fdfdfd), color-stop(50%,#dbdbdb)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #fdfdfd 0%,#dbdbdb 50%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #fdfdfd 0%,#dbdbdb 50%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #fdfdfd 0%,#dbdbdb 50%); /* IE10+ */
+    background: linear-gradient(to bottom, #fdfdfd 0%,#dbdbdb 50%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fdfdfd', endColorstr='#dbdbdb',GradientType=0 ); /* IE6-9 */
+	border-bottom: 1px solid #999999;
+	
+}
+
+.content-padding{
+	padding: 20px 0 0 15px;
+}
+
+fieldset {
+	border: 1px solid white;
+}
+
+button {
+	height: 50px;
+    font-size: 0.8em;
+    background: silver;
+    color: white;
+    text-transform: uppercase;
+    cursor: pointer;
+    width: 200px;
+    background: -moz-linear-gradient(top, silver 0%, #931416 50%, silver 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ec1f28), color-stop(50%,#931416), color-stop(100%,#ec1f28)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #ec1f28 0%,#931416 50%,#ec1f28 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #ec1f28 0%,#931416 50%,#ec1f28 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #ec1f28 0%,#931416 50%,#ec1f28 100%); /* IE10+ */
+    background: linear-gradient(to bottom, #ec1f28 0%,#931416 50%,#ec1f28 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ec1f28', endColorstr='#ec1f28',GradientType=0 ); /* IE6-9 */
+    margin: 5px 0 10px 0px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -khtml-border-radius: 5px;
+    border-radius: 10px;
+    
+}
+
+label {
+
+	line-height: 30px;
+	font-size: .9em;
+	font-family: 'Avenir';
+}
+
+
+input {
+	
+	height: 20px; 
+	border-radius: 5px; 
+	border: 1px solid #999999;
+	padding-left: 5px;
+	font-size: 14px;
+	color: gray;
+	
+}
+
+.content ul, .content ol { 
+	padding: 0 15px 15px 40px; 
+}
+
+ul.nav {
+	list-style: none; 
+	margin-bottom: 15px; 
+	padding-top: 20px;
+	font-size: .9em;
+}
+ul.nav li {
+	border-bottom: 1px dotted #666;
+	
+}
+ul.nav a, ul.nav a:visited {
+	padding: 5px 5px 5px 15px;
+	display: block; 
+	text-decoration: none;
+	background-color: #dddee2;
+	color: #005ca6;
+	padding: 10px 10px;
+}
+ul.nav a:hover, ul.nav a:active, ul.nav a:focus { 
+	
+	color: #005ca6;
+	background: #dddee2 url("../images/arrow.png");
+	background-position: right;
+	background-repeat: no-repeat;
+	
+}
+
+.footer {
+	padding: 10px 0;
+
+	position: relative;
+	clear: both;
+}
+
+.fltrt { 
+	float: right;
+	margin-left: 8px;
+}
+.fltlft { 
+	float: left;
+	margin-right: 8px;
+}
+.clearfloat {
+	clear:both;
+	height:0;
+	font-size: 1px;
+	line-height: 0px;
+}
+
+.infobox {
+  background-color:#fff;
+  padding:10px 0;
+  width:100%;
+  margin-bottom:10px;
+  font-family: 'Avenir';
+}
+
+.breadcrumbs {
+	height: 25px; 
+	background-color: ;
+	border-top: 1px solid #95856e;
+	background: -moz-linear-gradient(top, LightGray 0%, #eaeaea 50%,);
+	/* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, LightGray
+		), color-stop(50%, #eaeaea)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, LightGray 0%, #eaeaea 50%);
+	/* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, LightGray 0%, #eaeaea 50%);
+	/* Opera 11.10+ */
+	background: -ms-linear-gradient(top, LightGray 0%, #eaeaea 50%);
+	/* IE10+ */
+	background: linear-gradient(to bottom, LightGray 0%, #eaeaea 50%);
+	/* W3C */
+	
+}
+
+.navText {
+	vertical-align: top;
+	margin: 10px 0;
+	line-height: 30px;
+}
+
+.sidebarBox {
+	background-color: #c2c7ca;
+	
+}
+
+.headerRole{
+	background: #dddee2 url("../images/headerBGRole.jpg") repeat-x;
+	height: 85px;
+}
+
+.headerRoleContent {
+	padding: 10px 20px;
+}
+
+.headerdetails{
+	vertical-align: top;
+	font-size: 14px;
+	padding: 9px 20px;
+}
+
+.headerLogout{
+	height: 20px;
+    font-size: 12px;
+    color: white;
+    border: 1px solid white;
+    cursor: pointer;
+    width: 70px;
+    background: -moz-linear-gradient(top, silver 0%, #931416 50%, silver 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ec1f28), color-stop(50%,#931416), color-stop(100%,#ec1f28)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #ec1f28 0%,#931416 50%,#ec1f28 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #ec1f28 0%,#931416 50%,#ec1f28 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #ec1f28 0%,#931416 50%,#ec1f28 100%); /* IE10+ */
+    background: linear-gradient(to bottom, #ec1f28 0%,#931416 50%,#ec1f28 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ec1f28', endColorstr='#ec1f28',GradientType=0 ); /* IE6-9 */
+    margin: 0 0 0 10px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -khtml-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.sideBoxcontent{
+	padding: 10px 0;
+}
+
+.redError{
+	color: red;
+}
+
+.maindataTable{
+	padding: 10px 15px;
+	min-height: 500px;
+	max-height: 3000px;
+}
+
+.padLeft{
+	padding-left: 15px;
+}
+
+
+/* Datatables related
+***************************************/
+.dataTables_wrapper table tbody td button {
+	margin: 0;
+}
+
+.button-datatables {
+	padding: 0;
+}
+
+.tablerow-admin-action {
+	width: 24%;
+	margin: 0;
+	text-align: center; 
+}
+
+.tablerow-admin-action a{
+	width: 1%;
+	margin: 0;
+	text-align: center; 
+	text-decoration: none;
+	color: #005ca6;
+}
+
+#empListTable_wrapper {
+	width : 70%;
+}
+
+#configListTable_wrapper {
+	width : 90%;
+}
+
+input .readOnly {
+	background-color:#dddee2;
+	border:solid 1px #dddee2;
+}
+
+.linkTitleHead {
+
+font-size: 13px;
+text-align: right;
+padding-right: 10px;
+padding-bottom: 10px;
+
+}
+
+.linkTitleHead a {
+
+color: #005CA6;
+padding: 15px;
+
+}
+
+.dataTableContainer{
+  width: 74%;
+}
+
+.hddetailreporttable th{
+	border-bottom:1px solid black;
+}
+
+.hddetailreporttable td{
+	border:1px solid black;
+}
+
+.subtotalRow{
+	background-color: #00CCCC;
+}
+
+.mainSubtotalRow{
+	background-color: #0066CC;
+	font-weight: bold;
+}
+

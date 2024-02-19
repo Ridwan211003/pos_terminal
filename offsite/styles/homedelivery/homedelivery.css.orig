@@ -1,0 +1,722 @@
+/*Homedelivery styles*/
+@CHARSET "UTF-8";
+@font-face {
+    font-family: 'Avenir';
+    src: url('../fonts/12_avenir_55_roman_05173-webfont.eot');
+    src: url('../fonts/12_avenir_55_roman_05173-webfont.eot?iefix') format('eot'),
+         url('../fonts/12_avenir_55_roman_05173-webfont.woff') format('woff'),
+         url('../fonts/12_avenir_55_roman_05173-webfont.ttf') format('truetype'),
+         url('../fonts/12_avenir_55_roman_05173-webfont.svg#webfontjSpbZQRv') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.hdFont {
+	font-family: 'Avenir',sans-serif;
+}
+
+#homePageContainer {
+	display : inline-block;
+	border : 1px solid black;
+	width : 100%;
+}
+
+.homePageLeftContainer img{
+	height : auto;
+	width: auto;
+}
+
+
+.homePageRightContainer {
+	border : 1px dashed brown;
+	height: 100%;
+	width: 100%;
+}
+
+.loginInfoContainer {
+	background-color: blue;
+}
+
+.loginInfoContainer * {
+	display : inline-block;
+	
+}
+
+.clear {
+	clear : both;
+}
+
+.dataTables_wrapper {
+	position : relative;
+	clear: both;
+	padding:10px 20px;deliveryOrderSearchPage
+	*zoom: 1;
+}
+
+.headerLogout{
+	height: 20px;
+    font-size: 12px;
+    color: white;
+    border: 1px solid white;
+    cursor: pointer;
+    width: 70px;
+    background: -moz-linear-gradient(top, silver 0%, #931416 50%, silver 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ec1f28), color-stop(50%,#931416), color-stop(100%,#ec1f28)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #ec1f28 0%,#931416 50%,#ec1f28 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #ec1f28 0%,#931416 50%,#ec1f28 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #ec1f28 0%,#931416 50%,#ec1f28 100%); /* IE10+ */
+    background: linear-gradient(to bottom, #ec1f28 0%,#931416 50%,#ec1f28 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ec1f28', endColorstr='#ec1f28',GradientType=0 ); /* IE6-9 */
+    margin: 0 0 0 10px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -khtml-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.appName{
+	color: #005CA6;
+	font-size: 20px;
+	line-height: 28px;
+}
+
+.contentHeaderHD {
+	width: 90%;
+	margin: 2% 5%;
+}
+
+.mainContent {
+	position : relative;
+	min-height: 0px;
+}
+
+.singlePageContainer {
+	/* position: absolute;
+	top : 0px;
+	width: 100%; */
+}
+
+.searchPage {
+	padding: 20px;
+}
+
+<<<<<<< HEAD
+.deliveryOrderSearchPage{
+  width: 36%;	
+=======
+.deliveryOrderSearchPage {
+  width: 25%;	
+>>>>>>> 1.7
+  float: left;
+}
+.searchPage table tr td label {
+	text-transform: uppercase;
+	padding-right: 10px;
+	
+}
+
+.searchPage table tr td input {
+	padding: 0 10px;
+	
+}
+
+.hdinputBox {
+	height: 30px; 
+	border-radius: 5px; 
+	border: 1px solid #999999;
+}
+
+.hdmainTitle {
+	color: #005CA6;
+  font-weight: normal;
+  line-height: 5px;
+  margin-top: 0;
+  padding-right: 15px;
+  font-size: 19px;
+}
+
+.hdtitleBG {
+	background: -moz-linear-gradient(top, #fdfdfd 0%, #dbdbdb 50%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fdfdfd), color-stop(50%,#dbdbdb)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #fdfdfd 0%,#dbdbdb 50%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #fdfdfd 0%,#dbdbdb 50%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #fdfdfd 0%,#dbdbdb 50%); /* IE10+ */
+    background: linear-gradient(to bottom, #fdfdfd 0%,#dbdbdb 50%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fdfdfd', endColorstr='#dbdbdb',GradientType=0 ); /* IE6-9 */
+	border-bottom: 1px solid #999999;
+	border-top: 1px solid #999999;
+	height: 20px;
+	
+}
+
+.nextBtn{
+	padding: 0 0 20px 20px;
+}
+
+.btnDelInfo{
+	
+	width: 100%;
+	
+}
+
+/*collapse expand*/
+
+
+/*Define Accordion box*/
+.accordion { font-family: 'Avenir',sans-serif; overflow:hidden; margin:10px 20px; color:#474747; font-size: 14px }
+
+/*General Accordion****************************************************************************/
+/*Set style of open slide*/
+.accordion section:target { background:#FFF; padding:10px;}
+.accordion section:target:hover { background:#FFF; }
+.accordion section:target h2 {width:98%;}
+.accordion section:target h2 a{ color:#333; padding:12px 0;}
+.accordion section:target p {display:block;}
+.accordion section h2 a{padding:27px 10px;display:block; font-size:16px; font-weight:normal;color:#eee; text-decoration:none; }
+
+/*set style of closed slide*/
+.accordion section{ float:left;	overflow:hidden; color:#333; cursor:pointer; background: #333; margin:3px; }
+.accordion section:hover {background:#444;}
+.accordion section p { display:none; }
+.accordion section:after{position:relative;font-size:24px;color:#000;font-weight:bold;}
+
+/*End General Accordion****************************************************************************/
+
+
+
+/*Vertical Accordion *************************************************************************/
+.vertical section{ width:100%; height:40px;
+	-webkit-transition:height 0.2s ease-out;
+	-moz-transition:height 0.2s ease-out;
+  	-o-transition:height 0.2s ease-out;
+	-ms-transition:height 0.2s ease-out;
+  	transition:height 0.2s ease-out;
+}
+/*Set height of the slide*/
+.vertical :target{ height:auto; width:97%; }
+
+.vertical section h2 { position:relative; left:0; top:-15px; }
+
+/*Set position of the number on the slide*/
+.vertical section:after{ top:-60px;left:810px;}
+.vertical section:target:after{ left:-9999px;}
+
+
+.whitesmoke {
+	background-color: whitesmoke;
+	
+}
+
+.floralwhite {
+	background-color: floralwhite;
+}
+
+.p3table{
+	font-size: 13px;
+	width: 98%;
+	padding: 0 20px;
+}
+
+.p3table.addressTable {
+	padding-bottom: 20px; 
+	padding-left:40px
+}
+
+.p3table tr td {
+	padding: 0 20px;
+	
+}
+
+.p3tableleft {
+	width: 100%;
+	padding-bottom: 20px;
+}
+
+.invalid {
+	color : red;
+}
+
+#page5searchOrderList {
+	list-style: none outside none;
+<<<<<<< HEAD
+	width: 55%;
+	float : right;
+=======
+	width: 60%;
+	float : right;
+	padding-left: 10px;
+	padding-right: 10px;
+>>>>>>> 1.7
+}
+
+#page5searchOrderList li{
+	border-bottom: 1px dotted #CCCCCC;
+	border-top: 1px dotted #CCCCCC;
+  font-size: 15px;
+  position: relative;
+  width: 97%;
+  padding-left: 30px;
+}
+
+.page5SearchTable {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.headerRedirect {
+	height: 20px;
+    font-size: 12px;
+    color: white;
+    border: 1px solid white;
+    cursor: pointer;
+    width: 135px;
+    background: -moz-linear-gradient(top, silver 0%, #931416 50%, silver 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ec1f28), color-stop(50%,#931416), color-stop(100%,#ec1f28)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #ec1f28 0%,#931416 50%,#ec1f28 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #ec1f28 0%,#931416 50%,#ec1f28 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #ec1f28 0%,#931416 50%,#ec1f28 100%); /* IE10+ */
+    background: linear-gradient(to bottom, #ec1f28 0%,#931416 50%,#ec1f28 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ec1f28', endColorstr='#ec1f28',GradientType=0 ); /* IE6-9 */
+    margin: 0 0 0 10px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -khtml-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.deliveryItem {
+	font-family:  'Courier';
+	text-align: center;
+}
+
+#hdTransactionResultContainer {
+	padding : 30px;
+}
+
+.deliveryNote {
+	font-family: 'Avenir',sans-serif;
+	font-size : 14px;
+	clear: both;
+}
+
+.deliveryNote h3 {
+	font-family:  'Courier';
+	text-align: center;
+	font-size: 32px;
+	padding : 30px;
+}
+
+.deliveryNote .dnHeader {
+	display : none;
+}
+
+.deliveryNote .deliveryNoteHeaderTitle {
+	font-size: 30px;
+	display: none;
+}
+
+.deliveryNote .deliveryNoteTitleContainer {
+	text-align: center;
+}
+
+.delvieryNote .label_delivery_date {
+	width: 150px;
+}
+
+.delNoteLabel {
+	text-align: left; 
+	padding: 5px 20px;
+	width: 250px;
+}
+
+.deliveryNote .fieldValue {
+	padding-left : 10px;
+}
+
+.deliveryNote .delNoteAddressTable {
+	width: 50%;
+	font-family : 'Courier';
+	float : left;
+}
+
+.deliveryNote .deliveryItems {
+  padding-left: 10px;
+  padding-right: 50px;
+  width: 100%;
+}
+
+.deliveryNote .deliveryItems tr{
+	text-align : center;
+}
+
+.deliveryNote .footer {
+	display : none;
+}
+
+.deliveryNote table.deliveryNoteReceiptTotalContainer {
+	width: 100%;
+	padding : 20px;
+}
+
+.deliveryNote .deliveryNoteReceiptTotalContainer .deliveryNoteReceiptLabel {
+	width: 200px;
+}
+
+.deliveryNote .deliveryNoteReceiptTotalContainer .deliveryNoteReceiptLabel2 {
+	padding-left: 30px;
+}
+
+.deliveryNote .deliveryNoteSectionContainer {
+	width :96%; 
+}
+
+.deliveryNote .deliveryNoteAddressTable {
+	width: 100%;
+}
+
+.deliveryNote .deliveryNoteTaxTable {
+	width : 100%;
+}
+
+.deliveryNote .deliveryNoteReceiptThankYouMessageContainer {
+	text-align: center;
+	padding: 10px;
+}
+
+.deliveryNote .deliveryOrderPaymentReceiptContainer {
+	float: right; 
+	width : 35%; 
+	border: 1px solid gray;
+}
+
+.deliveryNote .deliveryNoteReceiptTitle {
+	text-align: center; 
+	text-decoration:underline; 
+	font-weight:bold; 
+	font-size : 20px;
+	padding-top: 10px;
+}
+
+.deliveryNote table.deliveryOrderInfoTable {
+	float: left; 
+	width : 60%;
+}
+
+.deliveryNote .deliveryNotePrintType {
+	font-size: 18px;
+}
+
+.PrintArea {
+    margin: 20px 5px;
+    padding: 10px;
+    width: 400px;
+}
+.button {
+    background: none repeat scroll 0 0 #999999;
+    border: 1px solid blue;
+    color: #EEEEEE;
+    cursor: pointer;
+    padding: 3px 5px;
+    text-align: center;
+    width: 80px;
+}
+span.test {
+    color: red;
+}
+
+#Retain.PrintArea.area1 {
+    border: 1px solid #999;
+}
+
+.PrintArea.area1 {
+    border: solid 1px #ffb40f;
+}
+
+.PrintArea.area2 {
+    border: solid 1px #20ff58;
+}
+
+.iconText {
+	font-size: 14px;
+	
+}
+
+.iconText a {
+	text-decoration: none;
+	
+}
+
+.spacingText {
+	padding: 20px 20px 0 0; 
+}
+
+.p3border {
+	margin: 0 0;
+}
+
+.verifyResult {
+	display : none;
+}
+
+.completeResult {
+	display : none;
+}
+
+.cancelResult {
+	display: none;
+}
+.itemDetail {
+	border: 1px dotted gray; 
+	border-radius: 10px;
+}
+
+.itemDetail thead {
+	background-color: whitesmoke;
+	
+}
+
+.itemDetail thead tr th {
+	padding: 10px 0;
+	font-family: 'Avenir',sans-serif;
+	
+}
+
+.itemDetail tbody {
+	border-bottom: 1px dotted gray;
+	margin: 5px 0;
+	background-color: floralwhite;
+	
+}
+
+.itemDetail tbody tr td {
+	padding: 5px 0;
+	font-family: 'Avenir',sans-serif;
+	
+}
+	
+.delNotetTitle {
+	text-align: right; 
+	padding: 5px 20px;
+	width: 50%;
+}
+
+.searchDelOrderTitle {
+	text-align: right; 
+	padding: 5px 10px;
+	width: 30%;
+}
+
+.padTop {
+	padding-top: 20px;
+}
+
+.padLeft{
+	padding-top: 20px;
+}
+
+.subQuantity {
+	width :85%; 
+	padding: 20px; 
+	background-color: red; 
+	border-radius: 10px;
+	text-align:right
+}
+
+.iconText a {
+	text-decoration: none;
+	
+}
+
+.spacingText {
+	padding: 20px 20px 0 0; 
+}
+
+.p3border {
+	margin: 0 0;
+}
+
+.completeResult {
+	display : none;
+}
+
+.itemDetail {
+	border: 1px dotted gray; 
+	border-radius: 10px;
+}
+
+.itemDetail thead {
+	background-color: whitesmoke;
+	
+}
+
+.itemDetail thead tr th {
+	padding: 10px 0;
+	font-family: 'Avenir',sans-serif;
+	
+}
+
+.itemDetail tbody {
+	border-bottom: 1px dotted gray;
+	margin: 5px 0;
+	background-color: floralwhite;
+	
+}
+
+.itemDetail tbody tr td {
+	padding: 5px 0;
+	font-family: 'Avenir',sans-serif;
+	
+}
+
+.searchDelOrderTitle {
+	text-align: right; 
+	padding: 5px 10px;
+	width: 30%;
+}
+
+.padTop {
+	padding-top: 20px;
+}
+
+<<<<<<< HEAD
+=======
+.padLeft{
+	padding-top: 20px;
+}
+
+.subQuantity {
+	width :85%; 
+	padding: 20px; 
+	background-color: red; 
+	border-radius: 10px;
+	text-align:right
+}
+
+.iconText a {
+	text-decoration: none;
+	
+}
+
+.spacingText {
+	padding: 20px 20px 0 0; 
+}
+
+.p3border {
+	margin: 0 0;
+}
+
+.completeResult {
+	display : none;
+}
+
+.itemDetail {
+	border: 1px dotted gray; 
+	border-radius: 10px;
+}
+
+.itemDetail thead {
+	background-color: whitesmoke;
+	
+}
+
+.itemDetail thead tr th {
+	padding: 10px 0;
+	font-family: 'Avenir',sans-serif;
+	
+}
+
+.itemDetail tbody {
+	border-bottom: 1px dotted gray;
+	margin: 5px 0;
+	background-color: floralwhite;
+	
+}
+
+.itemDetail tbody tr td {
+	padding: 5px 0;
+	font-family: 'Avenir',sans-serif;
+	
+}
+
+.delNotetTitle {
+	text-align: right; 
+	padding: 5px 20px;
+	width: 50%;
+}
+
+.padTop {
+	padding-top: 20px;
+}
+
+>>>>>>> 1.7
+th.tdAmount {
+	vertical-align: middle;
+	text-align: center;
+}
+
+td.tdAmount  {
+	vertical-align: middle;
+	text-align: right;
+}
+
+td.tdCenter {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.hdcreate{
+	text-align:right;
+	padding: 10px 0px 20px 0px;
+	font-weight: bolder;
+}
+
+.dnsubheader{
+	font-weight: bolder;
+	text-align: left;
+	font-size: 15px;
+}
+<<<<<<< HEAD
+=======
+
+.hdtssuccessmsg{
+	color: #000000;
+	font-weight: bolder;
+	font-size:.9em;
+}
+
+ul.cardPaymentDialogErrorList {
+	list-style: none outside none;
+}
+
+.xdsoft_timepicker_operationalDelivDate .xdsoft_datetimepicker  .xdsoft_timepicker{
+	width: 100px;
+	float:left;
+	text-align:center;
+	margin-left:8px;
+	margin-top:0px;
+}
+
+.dlgDelivOperatorId{
+	width:160px;
+	height:23px;
+}
+
+#loading {
+background:url("../../images/loading-image.gif") no-repeat center center;
+height: 100px; width: 100px;
+position: fixed; left: 50%; top: 50%; z-index: 1000;
+margin: -25px 0 0 -25px;
+display: none;
+}
+
+#overlay {
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 999;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+>>>>>>> 1.7

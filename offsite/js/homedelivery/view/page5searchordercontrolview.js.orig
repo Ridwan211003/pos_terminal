@@ -1,0 +1,66 @@
+Homedelivery.Page5SearchOrderControlView = Backbone.Epoxy.View.extend({
+	el : '#page5SearchTable',
+	model : new Homedelivery.SearchOrder(),
+
+	events : {
+		'click #page5SearchBtn' : 'searchOrder',
+		'click #page5ClearAllBtn' : 'clearAll',
+		'click .clearButton' : 'clearDate',
+		'click #searchOrderDate' : 'selectDate'
+	},
+	
+	bindings : {
+		'#searchOrderDate' : 'value:searchOrderDate,events:["click", "focus", "blur"]',
+		'#searchOrderNumber' : 'value:searchOrderNumber,events:["keyup"]',
+		'#searchOrderName' : 'value:searchOrderName,events:["keyup"]',
+		'#searchOrderAddress' : 'value:searchOrderAddress,events:["keyup"]'
+	},
+	
+	initialize : function(){
+		_(this).bindAll('searchOrder', 'clearDate', 'selectDate');
+		this.$('#searchOrderDate').datetimepicker(hdSettings.searchOrderDatePicker).val('');
+		this.collection.setSearchOrderModel(this.model);
+	},
+	
+	render : function() {
+		this.$el.show();
+	},
+	
+	searchOrder : function(){
+		if(this.model.validate()){
+			this.collection.reset();
+			this.collection.fetch({
+				success : function(collection, response, options){
+					if(collection.length == 0) {
+						alert("Search returned empty result.");
+					}
+				},
+				error : function(collection, response, options){
+					alert("Error fetching searchOrder");
+				}
+			});
+		} else {
+			alert('Search criteria should not be blank.');
+		}
+
+	},
+	
+	clearAll : function(){
+		this.model.set(Homedelivery.SearchOrder.prototype.defaults);
+		this.$('.clearButton').hide();
+		this.collection.reset();
+	},
+	
+	selectDate : function(){
+		this.$('.clearButton').show();
+	},
+	
+	clearDate : function(){
+		this.$('#searchOrderDate').val('');
+<<<<<<< HEAD
+=======
+		this.model.set('searchOrderDate', '');
+>>>>>>> 1.7
+		this.$('.clearButton').hide();
+	},
+});

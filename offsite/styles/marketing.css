@@ -1,0 +1,107 @@
+/* Marketing Ads page
+**************************************/
+.action-notification {
+    color: red;
+}
+.maindataTable {
+    min-height: 2500px;
+    max-height: 3000px;
+}
+#screenButtons {
+    position: absolute;
+    top: 265px;
+    padding-left: 15px;
+}
+#screenButtons button {
+    width: 160px;
+    height: 40px;
+}
+#previewScreenMenu {
+    position: absolute;
+    top: 320px;
+    left: 75%;
+}
+#previewScreenMenu button {
+    width: 200px;
+    height: 50px;
+}
+.cus-ad-create #saveAd, .cus-ad-create #cancelBtn {
+   
+}
+#marketingAdsTable {
+    width: 98% !important;
+}
+#marketingAdsTable tbody tr td button {
+    width: 50px;
+    height: 30px;
+}
+#configListTable {
+    width: 808px !important;
+    float: left;
+}
+#configListTable_filter {
+    float: left;
+    margin-left: 210px;
+}
+#configListTable_paginate {
+    float: left;
+    margin-right:0px;
+}
+
+label.error {
+    color: red;
+}
+
+/* Marketing tooltip
+**************************************/
+.field-tip {
+    position: relative;
+    cursor: help;
+}
+
+.field-tip .tip-content {
+    position: absolute;
+    top: -18px; /* - top padding */
+    right: 9999px;
+    width: 230px;
+    margin-right: -237px; /* width + left/right padding */
+    padding: 10px;
+    color: #fff;
+    background: #333;
+    -webkit-box-shadow: 2px 2px 5px #aaa;
+    -moz-box-shadow: 2px 2px 5px #aaa;
+    box-shadow: 2px 2px 5px #aaa;
+    opacity: 0;
+    -webkit-transition: opacity 250ms ease-out;
+    -moz-transition: opacity 250ms ease-out;
+    -ms-transition: opacity 250ms ease-out;
+    -o-transition: opacity 250ms ease-out;
+    transition: opacity 250ms ease-out;
+}
+/* <http://css-tricks.com/snippets/css/css-triangle/> */
+.field-tip .tip-content:before {
+    content: ' '; /* Must have content to display */
+    position: absolute;
+    top: 32%;
+    left: -15px; /* 2 x border width */
+    width: 0;
+    height: 0;
+    margin-top: -8px; /* - border width */
+    border: 8px solid transparent;
+    border-right-color: #333;
+}
+
+.field-tip:hover .tip-content {
+    right: -20px;
+    opacity: 1;
+}
+
+.field-tip {
+    font-size: 0.9em;
+}
+
+/* Marketing preview pages
+**************************************/
+#modalCashierPreview {
+    overflow: hidden;
+}

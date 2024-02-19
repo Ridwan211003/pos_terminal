@@ -1,0 +1,130 @@
+/**
+ * Serial Device EDC Terminal Interface
+ * RS232 Serial Configuration.
+ */
+var serialport = require('serialport');
+var SerialPort = serialport.SerialPort;
+var config = require(".././config/config.js");
+
+var TRANSMISSION_SUCCESS = "[POS => EDC]: Message transmission success.";
+var TRANSMISSION_ERROR = "[POS => EDC]: Message transmission failed.";
+var edcCtr = 0;// flag to emit the data
+var dataArray = [];// data to process in pos
+
+//checks if proxy is running at test mode.
+config = config.getConnection();
+
+//device port
+var devicePath = config.device.edc;
+console.log("edc:"+devicePath);
+
+//catch error if creating serial connection fails
+serialport.on('error', function(err) {
+	  console.log(err);
+});
+
+//create serial device instance and set its configuration
+var serial_port = new SerialPort(devicePath,  {
+	parser: serialport.parsers.raw,
+	baudrate : 38400,
+	databits : 8,
+	parity : 'none',
+	stopbits: 1
+}, false);
+
+serial_port.open(function (err) {
+	if(err)
+		console.log(err);
+	else
+		console.log('Edc is ready. Path: ' + devicePath);
+});
+
+//open serial port connection
+serial_port.on("open", function() {
+	console.log("edc terminal is ready.");
+});
+
+/**
+ * Process request from eft online function and
+ * sends response back to pos.
+ */
+exports.payment_gateway = function(req, res){
+	req.on('data', function(data) {
+		//write/push data to edc terminal.
+		serial_port.write(toBuffer(JSON.parse(data), 'hex'), function(err, results) {
+			if(err){
+				console.log(TRANSMISSION_ERROR);
+				sendResponse(res, 400, 'Bad Request', 'application/json;charset=UTF-8'
+						, JSON.stringify({msg:TRANSMISSION_ERROR}));
+			}
+			if(results){
+				console.log(TRANSMISSION_SUCCESS);
+				sendResponse(res, 200, 'OK', 'application/json;charset=UTF-8'
+						, JSON.stringify({msg:TRANSMISSION_SUCCESS}));
+			}
+			res.end();
+		});
+	});
+};
+
+/**
+ * Sends response message back to POS.
+ * @param res
+ * @param statusCode
+ * @param statusMsg
+ * @param contentType
+ * @param body
+ */
+function sendResponse(res, statusCode, statusMsg, contentType, body) {
+	res.writeHead(statusCode, statusMsg, { 'Content-Type': contentType });
+	res.end(body);
+}
+
+/**
+ * Pass data to buffer obj; this manipulates data to specific (hex, utf8 etc.)streams.
+ * See nodejs documentation for buffer obj.
+ * @param data - data to place in buffer object
+ * @param type - type of encoding; hex, utf8, utf16le;
+ * @returns {Buffer}
+ */
+function toBuffer(data, type){
+	var buffer = new Buffer(data, type);
+	return buffer;
+}
+
+/**
+ * Function to get response message from bank.
+ * @param io - websocket obj
+ */
+exports.getEdcResponse = function(io){
+<<<<<<< HEAD
+	//listener that reads data from serial port
+=======
+	//open serial connection for edc.
+>>>>>>> 1.3.1-snapshot
+	serial_port.on('data', function(data) {
+		//push each data to array
+		for(var i = 0; i < data.length; i ++){
+			dataArray.push(data[i]);
+		}
+		// trap message that is sent separately
+		if(edcCtr == 0){
+			// emit data function
+			emitEftData(io);
+			edcCtr++;
+		}
+	});
+};
+
+/**
+ * Function to emit data from edc to pos.
+ */
+function emitEftData(io){
+	//set delay to emit data that is collected from bulk data
+	setTimeout(function(){
+		console.log("response data: " + dataArray.toString());
+		edcCtr = 0;
+		io.sockets.emit('EFTData', dataArray);
+		dataArray = [];
+	}, 2000);
+};

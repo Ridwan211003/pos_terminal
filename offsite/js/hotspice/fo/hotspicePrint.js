@@ -1,0 +1,1 @@
+var HOTSPICE_PRINT = HOTSPICE_PRINT || {};

@@ -1,0 +1,181 @@
+/**
+ * Barcode Parsing
+ * Serial and Usb Implementation
+ * Serial implementation using RS232 configuration.
+ * USB implementation using keyboard input configuration.
+ */
+var http = require('http');
+var fs = require('fs');
+var serialport = require('serialport');
+var SerialPort = serialport.SerialPort;
+var config = require(".././config/config.js");
+var constants = require("../possapp.proxy.constants.js");
+
+var serialports = [];
+
+//checks if proxy is running at test mode.
+config = config.getConnection();
+
+//raw data buffer
+var myParser = function(emitter, buffer) {
+    emitter.emit("data", buffer);
+};
+
+/**
+ * Get list of serial devices connected to the pos terminal
+ */
+serialport.list(function (err, ports) {
+	if(err)
+		console.log("No serial ports attached" + err);
+	if(ports)
+		initScannerDevice();
+});
+
+/**
+ * Get device path from list of ports available in the pos terminal
+ */
+var serialPortObj = function serialPortObj(serialport, options){
+	this.options = options;
+	this.serialport = serialport;
+
+	this.serialport.on('open', function(err){
+        if(err){
+            console.log(err);
+        }
+        console.log(constants.SCANNER.INIT_SCANNER_MSG + serialport.path);
+	});
+};
+
+/**
+ * Options/Additional attributes to be used by scanner devices.
+ */
+var options = function options(serial){
+	this.isSerial = serial;
+};
+
+/**
+ * Init serialport device.
+ * Checks the path to determine if scanner used is usb or serial.
+ */
+var initScannerDevice = function(){
+	for(var path in config.device){
+		if(path.search("scanner") != -1){
+			var devPath = config.device[path];
+			var isSerial = false;
+			if(devPath.search("/dev/ttyS") != -1 || devPath.search("/dev/pts/") != -1){
+				isSerial = true;
+			}
+
+			//creates serial port instance and puts in to serialport list
+			serialports.push(new serialPortObj(
+					new SerialPort(devPath, {parser:myParser}),
+					new options(isSerial)
+			));
+		}
+	}
+};
+
+/**
+ * listener when barcode scanner is trigger
+ */
+exports.scan_barcode = function(io) {
+	var barcode = [];
+	for(var spo in serialports){
+		if(serialports[spo].options.isSerial){
+			serialports[spo].serialport.on('data', function(data){
+				comBarcodeReader(io, barcode, data);
+			});
+		} else {
+			serialports[spo].serialport.on('data', function(data){
+				usbBarcodeReader(io, barcode, data);
+			});
+		}
+	}
+};
+
+/**
+ * Serial COM --> RS-232 Standard Implementation
+ */
+var comBarcodeReader = function (io, barcode, data){
+	try{
+		for(var ctr=0; ctr < data.length; ctr++){
+			//add each numeric raw data to barcode array
+			if(data[ctr]>=constants.SCANNER.ASCII_CODE_OF_ZERO && data[ctr]<= constants.SCANNER.ASCII_CODE_OF_NINE){
+				barcode.push(data[ctr]);
+			}
+			//emit barcode when raw data is carriage return.
+			if(data[ctr] == constants.SCANNER.COM_TERMINATOR){
+				var buf = new Buffer(barcode);
+				console.log(buf.toString('ascii'));
+				io.sockets.emit('scanBarcode', buf.toString('ascii'));
+				barcode.length = 0;//reset barcode to empty array.
+			}
+		}
+	} catch(err){
+		console.log(constants.SCANNER.UNPARSABLE_BARCODE_MSG + err);
+		io.sockets.emit('scanBarcodeErr', constants.SCANNER.INVALID_BARCODE_SCANNED_MSG);
+	}
+};
+
+/**
+ * USB Scanners --> Keyboard Implementation
+ */
+var usbBarcodeReader = function(io, barcode, data) {
+	try{
+		// event type = 1 --> represents key press
+<<<<<<< HEAD
+		if(data.readUInt32LE(constants.SCANNER.EVENT_TYPE_INDEX) === CONSTANTS.SCANNER.EVENT_TYPE_VAL){
+=======
+		if(data.readUInt32LE(constants.SCANNER.EVENT_TYPE_INDEX) === constants.SCANNER.EVENT_TYPE_VAL){
+>>>>>>> 1.3.5
+			// offsetScannedValue represents the scanned int value;
+			var intCode = data.readUInt16LE(constants.SCANNER.BARCODE_INDEX);
+			// usb terminator code that determines end of barcode scanned.
+			if(intCode != constants.SCANNER.USB_TERMINATOR){
+				barcode.push(mapKeyCodeValue(intCode));
+			}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1.3.5
+			if(intCode === constants.SCANNER.USB_TERMINATOR){
+				console.log(barcode.join(''));
+					io.sockets.emit('scanBarcode', barcode.join(''));
+				barcode.length = 0;//reset barcode to empty array.
+			}
+		}
+	} catch(err){
+		console.log(constants.SCANNER.UNPARSABLE_BARCODE_MSG + err);
+		io.sockets.emit('scanBarcodeErr', constants.SCANNER.INVALID_BARCODE_SCANNED_MSG);
+	}
+}
+
+/************************
+ * USB Logic Functions
+ ************************/
+/**
+ * Key value pair of raw data value map to correct barcode value
+ */
+var keys = {};
+keys["11"]  = '0';
+keys["10"]  = '9';
+keys["9"]   = '8';
+keys["8"]   = '7';
+keys["7"]   = '6';
+keys["6"]   = '5';
+keys["5"]   = '4';
+keys["4"]   = '3';
+keys["3"]   = '2';
+keys["2"]   = '1';
+keys["1"]   = '0';
+
+/**
+ * Changes the raw data to the correct int utf-8 value.
+ */
+var mapKeyCodeValue = function(d) {
+	if(keys.hasOwnProperty(d)){
+		return keys[d];
+	} else {
+		return "";
+	}
+};

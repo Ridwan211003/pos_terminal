@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>Standard Web View</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="/pos-web/resources/styles/jQuery/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/pos-web/resources/styles/transretail.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/pos-web/resources/styles/keyboard.css" />
+
+    <script src="/pos-web/resources/js/lib/modernizr.custom.29837.js"></script>
+    <script src="/pos-web/resources/js/lib/jquery-1.8.3.min.js"></script>
+    <script src="/pos-web/resources/js/lib/jquery-ui.js"></script>
+	<script src="/pos-web/resources/js/lib/keyboard.js"></script>
+	
+	<script>
+		/*<![CDATA[*/
+			var webContextPath = '\/pos-web';
+			var appBuildVersion = '2.0.0.EQNX';
+		/*]]>*/
+	</script>
+</head>
+
+<body class="tundra">
+	<div id="page" class="container">
+	    <div id="content">
+	        <div id="local" class="span-6">
+	
+	        </div>
+	        <div id="main" class="span-18 last">
+		<div class="container-login">
+		<div class="content-login">
+		<div class="login-logo">
+			<img class="img" src="display/displayLoginLogo" /><!--<img class="img" src="../../images/logo-login.jpg" th:attr="src=@{/images/logo-login.jpg},title=#{logo},alt=#{logo}" />-->
+            
+
+		</div>
+		<div class="login-form">
+		    <div class="error">
+		        
+		        
+		    </div>
+		    <form id="loginForm" name="f" action="/pos-web/resources/j_spring_security_check" method="post">
+		        <fieldset class="login-fieldset">
+		        	<input type="hidden" id="posMacAddress" name="posMacAddress" />
+
+		          	<label for="j_username">User ID:</label>&nbsp;<span id="errorj_username"></span>
+		           	<br />
+		           	<input type="text" class="textBox" name="j_username" id="j_username" value="" />
+
+		           	<label for="j_password">Password:</label>&nbsp;<span id="errorj_password"></span>
+		           	<br />
+		           	<input type="password" name="j_password" id="j_password" class="textBox" />
+			       	<span class="loginBtnCtr">
+		            <button id="submit" type="submit">Login</button>
+			       </span>
+		        </fieldset>
+		    </form>
+		</div>
+	    </div>
+	</div>
+    <div id="buildversion" align="center" class="footer"></div>
+    <div id="version" align="center" class="footer">POSS: <span id="possVersion"></span>; DATA: <span id="dataVersion"></span></div>
+	<script src="/pos-web/resources/js/login.js"></script>
+	<script src="/pos-web/resources/js/lib/socket.io.min.js"></script>
+	<script src="/pos-web/resources/js/common.js"></script>
+	<script src="/pos-web/resources/js/lib/jquery.validate.js"></script>
+	<script>
+		$("#loginForm").validate({
+			onfocusout: false,
+			errorPlacement : function($error, $element) {
+				var name = $element.attr("name");
+				$("#error" + name).append($error).fadeOut(7000,function(){
+					$("#error" + name).empty();
+					$("#error" + name).attr("style","");
+				});
+			},
+			rules : {
+				j_username : {
+					required : true
+				},
+				j_password : {
+					required : true
+				}
+			},
+			messages : {
+				j_username : "(Please fill up this field.)",
+				j_password : "(Please fill up this field.)"
+			},
+
+		});
+	</script>
+</div>
+	    </div>
+	</div>
+</body>
+</html>

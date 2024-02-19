@@ -1,0 +1,330 @@
+<html xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+<style>
+ .hidden {
+   visibility: hidden;
+ }
+ 
+ .tax-invoice-table{
+  font-size: 12pt;
+  margin-left: 50px;
+  width: 980px;
+  /*border: 1px solid black;*/
+ }
+ 
+ .tax-invoice-table.tax-invoice-table-list td {
+   font-size: 14.5pt;
+ }
+ 
+ .cust-info .item-label1 {
+  font-size: 9pt;
+  width: 100px;
+ }
+
+ .cust-info .item-value-line1 {
+  width: 550px;
+ }
+
+ .cust-info .item-label2 {
+  font-size: 9pt;
+  width: 150px;
+ }
+
+ .cust-info .item-value-line2 {
+  width: 184px;
+ }
+
+ .cust-info td {
+  /*top right bottom left*/
+  padding: 0px 0px 5px 5px;
+  line-height: 0.9;
+ }
+
+ .cust-info .item-label1-padbottom {
+   /*top right bottom left*/
+   padding: 0px 0px 0px 5px;
+ }
+
+ .transaction-number-label {
+  font-size : 9pt;
+  /*top right bottom left*/
+  padding: 0px 0px 3px 5px;
+ }
+
+ .transaction-number-value {
+  font-size : 12pt;
+ }
+ 
+ td.item-section-label {
+  font-size: 9pt;
+ }
+
+ .item-list-header {
+  font-size: 9pt;
+ }
+
+ .item-list-cell {
+  /*border: 1px solid black*/
+ }
+
+ .item-list-no-value {
+   height:15pt;
+ }
+
+ .item-list-nama-value {
+   padding-left: 5px; 
+  }
+  
+  .item-list-jumlah-value {
+  }
+
+  .item-list-saluan-value {
+    padding-right: 30px;
+  }
+
+  .item-list-jual-value {
+    padding-right: 60px;
+  }
+
+  .item-list-summary-nama {
+    padding-left:10pt;
+    /*border: 1px solid black;*/
+  }
+  .item-list-summary-jual {
+    font-size:12.0pt;
+    /*border: 1px solid black;*/
+  }
+
+  .item-list-summary-jumlah {
+    /*border: 1px solid black;*/
+  }
+
+  .item-list-summary-saluan {
+    /*border: 1px solid black;*/
+    padding-right: 10px;
+  }
+
+  .item-list-summary-jual {
+    /*border: 1px solid black;*/
+    padding-right: 50px;
+  }
+ 
+  #hcSummaryBreakdown {
+    height: 200px;
+  }
+  #hcSumaryBreakDownTable td {
+    font-size: 14.5pt;
+  }
+  
+  #taxInvoicePrint {
+  	height: 100px;
+  }
+  
+  #hcSignatoryContainer {
+		position:absolute; 
+		top: 1200px; 
+		left: 800px; 
+		height: 100px;
+  } 
+  
+  .asterisk {
+    font-size: 10pt;
+  }
+</style>
+</head>
+
+<body>
+
+<div style="background-size: 100% auto; padding-right: 10px;">
+<img class="hidden" src="./preprinted.jpg" style="width: 980px; height: 1260px; position: absolute; top: 38px; left: 46px; visibility: hidden;"></img>
+<div style="position: absolute;">
+<!-- In other computer height: 100px -->
+<table id="taxInvoicePrint" class="tax-invoice-table">
+ <tbody>
+  <tr class="item-section">
+	<td colspan="2"><p class="hidden" style="height: 30px; width: 50%; font-size: 19pt">GROCERINDO</p></td>
+	<td colspan="2" align="right"><p class="hidden" style="height: 30px; width: 50%; font-size: 19pt">GROCERINDO</p></td>
+  </tr>
+  <tr class="item-section">
+	<td colspan="2" align="center"><p class="hidden" style="font-size: 11pt">FAKTUR PENJUALAN / FAKTUR PAJAK</p></td>
+  	<td colspan="2" align="right" style='padding-right: 50px;' id='hcWatermark'></td>
+  </tr>
+ </tbody>
+</table>
+<table class="tax-invoice-table">
+<tbody>
+  <tr class="item-section">
+	<td align="left" style="width: 140px;" class="hidden transaction-number-label"><span>Nomor Transaksi:</span></td>
+	<td align="left" style="width: 120px;" class="transaction-number-value"><span id="hcTxnNo"></span></td>
+	<td align="left" style="width: 200px;" class="hidden transaction-number-label"><span>Nomor Seri Faktur Pajak:</span></td>
+	<td align="left" style="width: 220px;" class="transaction-number-value"><span id="hcTaxInvNo"></span></td>
+  </tr>
+  <tr class="item-section">
+    <td class="hidden item-section-label hidden transaction-number-label" align="left">Pengusaha Kena Pajak</td>
+  </tr>
+</tbody>
+</table>
+
+<table class="tax-invoice-table cust-info" >
+  <tbody>
+  <tr class="item-section">
+    <td class="item-label1-padbottom item-label1"><span class="hidden">Nama</span></td>
+    <td class="item-value-line1" ><span class="colon"></span><span id="hcSellerName" class="item-value"></span></td>
+    <td class="item-label2 item-label1-padbottom"><span class="hidden">Tanggal</span></td>
+    <td class="item-value-line2" ><span class="colon"></span><span id="hcDateIssued" class="item-value"></span></td>
+  </tr>
+
+  <tr class="item-section">
+    <td class="item-label1 item-label1-padbottom"><span class="hidden">Alamat</span></td>
+    <!-- Hardcoded for now. Will be changed if config value is available -->
+    <td class="item-value-line1" ><span class="colon"></span><span id="hcSellerAddr" class="item-value">Jl IR H Juanda No. 180 RT.003 RW 010 Kel. Margahayu Kec. Bekasi Timur. 
+Kota Bekasi, Jawa Barat</span></td>
+    <td class="item-label2 item-label1-padbottom"><span class="hidden">Kasir ID</span></td>
+    <td class="item-value-line2" ><span class="colon"></span><span id="hcCashierId" class="item-value"></span></td>
+  </tr>
+
+  <tr class="item-section">
+    <td class="item-label1"><span class="hidden">Telepon</span></td>
+    <td class="item-value-line1" ><span class="colon"></span><span id="hcTelephoneNo" class="item-value"></span></td>
+    <td class="item-label2"><span class="hidden">Nama toko</span></td>
+    <!-- Hardcoded for now. No configuration value set yet -->
+    <td class="item-value-line2" ><span class="colon"></span><span id="" class="item-value">Bekasi Juanda</span></td>
+  </tr>
+
+  <tr class="item-section">
+    <td class="item-label1"><span class="hidden">NPWP</span></td>
+    <td class="item-value-line1" ><span class="colon"></span><span id="hcSellerNpwp" class="item-value"></span></td>
+    <td class="item-label2"><span class="hidden">Halaman</span></td>
+    <td class="item-value-line2" ><span class="colon"></span><span id="hcPageN" class="item-value"></span></td>
+  </tr>
+</tbody>
+</table>
+
+<table class="tax-invoice-table cust-info">
+<tbody>
+  <tr class="item-section">
+    <td class="hidden item-section-label transaction-number-label" align="left" colspan="4">Pembali Barang Kena Pajak / Penerima Jasa Kena Pajak</td>
+  </tr>
+
+  <tr class="item-section">
+    <td class="item-label1"><span class="hidden">Nama</span></td>
+    <td class="item-value-line1" ><span class="colon"></span><span id="hcBuyerBizName" class="item-value"></span></td>
+    <td class="item-label2"><span class="hidden">Nomor Anggot</span></td>
+    <td class="item-value-line2" ><span class="colon"></span><span id="hcBuyerId" class="item-value"></span></td>
+  </tr>
+
+  <tr class="item-section">
+    <td class="item-label1"><span class="hidden">Alamat</span></td>
+    <td class="item-value-line1" ><span class="colon"></span><span id="hcBuyerTaxAddr" class="item-value"></span></td>
+    <td class="item-label2"><span class="hidden">Tgl. Pembelian</span></td>
+    <td class="item-value-line2" ><span class="colon"></span><span id="hcDatePurchased" class="item-value"></span></td>
+  </tr>
+  
+  <tr class="item-section">
+    <td class="item-label1"><span class="hidden">NPWP</span></td>
+    <td class="item-value-line1" ><span class="colon"></span><span id="hcBuyerNpwp" class="item-value"></span></td>
+    <td class="item-label2"><span class="hidden">Jam</span></td>
+    <td class="item-value-line2" ><span class="colon"></span><span id="hcTimePurchased" class="item-value"></span></td>
+  </tr>
+  </tbody>
+</table>
+<!-- Purchased items list -->
+<table class="tax-invoice-table tax-invoice-table-list" cellpadding=0 cellspacing=0>
+  <tr id="hcLineItemHeaderRow">
+    <td align="center" style="width: 47px;" class="item-list-cell"><span class="hidden item-list-header">No.</span></td>
+    <td align="center" style="width: 500px;" class="item-list-cell"><span class="hidden item-list-header">Nama Barang Kena Pajak / Jasa Kena Pajak</span></td>
+    <td align="center" style="width: 80px;" class="item-list-cell"><span class="hidden item-list-header">Jumlah</span></td>
+    <td align="center" style="width: 110px;" class="item-list-cell item-list-header"><div class="hidden item-list-header">Harga Satuan</div><div class="hidden item-list-header">(Rp.)</div></td>
+    <td align="center" style="width: 215px;" class="item-list-cell item-list-header"><div class="hidden item-list-header">Harga Jual/Penggantian</div><div class="hidden item-list-header">(Rp.)</div></td>
+  </tr>
+  <tbody id="hcItemsList">
+    <tr id="calculationSummaryFiller">
+ 			<td class='item-list-summary-no' height='180px' width=40 align='center'>&nbsp;</td>
+    	<td class='item-list-summary-nama' align='center' style='font-size:9.0pt;'><i>CALCULATION SUMMARY ON LAST PAGE</i></td>
+    	<td class='item-list-summary-jumlah' align='center'>&nbsp;</td>
+    	<td class='item-list-summary-saluan' align='center'>&nbsp;</td>
+    	<td class='item-list-summary-jual' align='center'>&nbsp;</td>
+    </tr>
+    <tr id='hcBiayaNonMember'>
+ 	<td class='item-list-summary-no'>&nbsp;</td>
+    	<td id='hclblBiayaNonMember' class='item-list-summary-nama'></td>
+    	<td class='item-list-summary-jumlah' align='center'>&nbsp;</td>
+    	<td class='item-list-summary-saluan'>&nbsp;</td>
+    	<td class='item-list-summary-jual' align='right' id='hcTotalNonMemberMarkup'>&nbsp;</td>
+     </tr>
+     <tr id="hcHargaJual">
+ 	<td class='item-list-summary-no'>&nbsp;</td>
+    	<td class='item-list-summary-nama'>Harga Jual</td>
+    	<td class='item-list-summary-jumlah' align='center' id='hcTotalQty'>&nbsp;</td>
+    	<td class='item-list-summary-saluan'>&nbsp;</td>
+    	<td class='item-list-summary-jual' align='right' id='hcTotalAmtNoTax'>&nbsp;</td>
+     </tr>
+     <tr id="hcPpn">
+  	<td class='item-list-summary-no'>&nbsp;</td>
+  	<td class='item-list-summary-nama'>PPN</td>
+  	<td class='item-list-summary-jumlah'>&nbsp;</td>
+  	<td class='item-list-summary-saluan'>&nbsp;</td>
+  	<td class='item-list-summary-jual' align='right' id='hcTotalVat'>&nbsp;</td>
+     </tr>
+     <tr id="hcTotalYangHarusDibayar">
+        <td class='item-list-summary-no'>&nbsp;</td>
+        <td class='item-list-summary-nama'>Total Yang Harus Dibayar</td>
+        <td class='item-list-summary-jumlah'>&nbsp;</td>
+        <td class='item-list-summary-saluan'>&nbsp;</td>
+        <td class='item-list-summary-jual' align='right' id='hcTotalAmtTaxed' style="border-bottom: 1px solid black">&nbsp;</td>
+      </tr>
+      <tr id="hcTotalMediaPayment">
+          <td class='item-list-summary-no'>&nbsp;</td>
+          <td class='item-list-summary-nama'>Total media payment</td>
+          <td class='item-list-summary-jumlah'>&nbsp;</td>
+          <td class='item-list-summary-saluan'>&nbsp;</td>
+	  <td class='item-list-summary-jual' align='right' id='hcTotalAmountPaid'>&nbsp;</td>
+      </tr>
+      <tr id="hcKembalian">
+         <td class='item-list-summary-no'>&nbsp;</td>
+	 <td class='item-list-summary-nama'>Kembalian</td>
+         <td class='item-list-summary-jumlah'>&nbsp;</td>
+	 <td class='item-list-summary-saluan'>&nbsp;</td>
+	 <td class='item-list-summary-jual' align='right' id='hcTotalChange' style="border-bottom: 1px solid black">&nbsp;</td>
+      </tr>
+  </tbody>
+</table>
+<div id="hcSummaryBreakDown">
+	<table id="hcSumaryBreakDownTable" class="tax-invoice-table" style="width:520px; margin-left: 117px">
+	      <tr>
+		<td align="center" width="90">&nbsp;</td>
+		<td align="center" width="80">HARGA</td>
+		<td align="center" width="80">PPN</td>
+		<td align="center" width="80">TOTAL HARGA</td>
+	      </tr>
+	      <tr>
+		<td>Barang &amp; Jasa Kena Pajak<span class="asterisk">&#10033</span></td>
+		<td id='sumSellingPriceTaxable' align='right'>&nbsp;</td>
+		<td id='sumPPN' align='right'>&nbsp;</td>
+		<td id='sumSellingPricePlusTax' align='right'>&nbsp;</td>
+	      </tr>
+	      <tr>
+		<td>Bukan Barang Kena Pajak &amp; Jasa Kena Pajak</td>
+		<td id='sumSellingPriceNonTaxable1' align='right'>&nbsp;</td>
+		<td align='right'>0</td>
+		<td id='sumSellingPriceNonTaxable2' align='right'>&nbsp;</td>
+	      </tr>
+	      <tr>
+		<td>GRAND TOTAL</td>
+		<td id='grandHarga' align='right'>&nbsp;</td>
+		<td id='grandPPN' align='right'>&nbsp;</td>
+		<td id='grandTotalHarga' align='right'>&nbsp;</td>
+	      </tr>
+	</table>
+</div>
+</div>
+<div id="hcSignatoryContainer" align ="right">
+  <div id="hcSignatoryLocation" style="padding: 10 0 10px 0px;"><span id="hcStoreLocation"></span>,<span id="hcDateIssuedSignatory"></span></div>
+  <div style="padding: 10 0 10px 0px;"><span id="hcSignatory"></span></div>
+</div>
+<div style="clear : both;"></div>
+</div>
+</body>
+</html>

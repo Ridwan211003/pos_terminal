@@ -1,0 +1,212 @@
+var CRMAccountModule = CRMAccountModule || {};
+
+/**
+ * Module utility for retrieving 
+ */
+CRMAccountModule.retriever = {
+<<<<<<< HEAD
+	findAccountId : function(accountId) {
+=======
+	findAccountId : function(accountId){
+>>>>>>> 1.4-snapshot
+		var crmRequestParams = {
+				id : accountId,
+				store: null,
+				paymentType: null,
+				amount: null,
+				cardNo: null,
+				transactionNo: null,
+				transactionDate: null,
+				store : saleTx.storeCd
+		};
+
+		CRMAccountModule.ajax.findAccountId(crmRequestParams, function(customer){
+			console.log("CRM response: " + JSON.stringify(customer));
+<<<<<<< HEAD
+			if (customer && customer.type != 'ERROR') {
+				console.log('Successful customer retrieved!');
+=======
+			if(customer && customer.type != 'ERROR') {
+				console.log('Successful customer retrieved!');
+				
+				CRMAccountModule.Hypercash.startProfCust(customer);
+				// global function from cashier.js
+				renderCustomerInfo(profCust.customerName, profCust.customerNumber);
+>>>>>>> 1.4-snapshot
+				
+				CRMAccountModule.Hypercash.startProfCust(customer);
+
+				// Assign barcode as Customer Id for reward.
+				// global variable from cashier.js
+				customerIdForReward = customer.accountId;
+				// global variable from cashier.js
+				availEmpLoyaltyPoints = true;
+				runningNonMemberMarkup = 0;
+<<<<<<< HEAD
+
+				/*	
+				 * If non-member, enter customer information for invoice
+				 */
+				if (CRMAccountModule.Hypercash.getMemberType(customer) == CONSTANTS.CRM_MEMBER_TYPES_DESC.NONMEMBER) {
+					Hypercash.service.enterCustomerInformation();
+				}
+
+				// global function from cashier.js
+				renderCustomerInfo(profCust.customerName, profCust.customerNumber); //TODO: Delete this line on testing
+=======
+>>>>>>> 1.4-snapshot
+			} else if (customer &&
+					   customer.messageCode != "ERR005" &&
+					   customer.messageCode != "ERR003" &&
+					   customer.messageCode != "ERR004") {
+				// common function from common.js
+				//alert in the POS screen, so the cashier able to report to senior cashier to be followed up to customer service desk
+				showMsgDialog(customer.message, "error");
+				promptSysMsg();
+			} else {
+				//proceed to CRM offline mode
+				showConfirmDialog(getMsgValue("pos_error_crm_offline_mode"), 'ERROR!', function() {
+				if (isHcEnabled) {
+						var accountId = CRMAccountModule.Hypercash.lastCustomerCardScanned != "" ? CRMAccountModule.Hypercash.lastCustomerCardScanned : getConfigValue('HC_NON_MEMBER_DEF_CARDNO');
+
+						console.log("Entering CRM offline mode | Customer card: ", accountId);
+						CRMAccountModule.Hypercash.activateCRMOfflineMode(accountId);
+					}
+				});
+			}
+		}, 
+		/**
+		 * errorCallback
+		 */
+		function(jqXHR, status, error) {
+			console.log('Failed customer retreive ' + error);
+			console.log('ERROR', getConfigValue('CRM_URL_FIND_MEMBER'), JSON.stringify(error));
+			//alert in the POS screen, so the cashier able to report to senior cashier to be followed up to customer service desk
+			//showMsgDialog('CANNOT ACCESS CRM SERVICE', "error");
+
+			//$("#popup-confirm-dialog").dialog("option", "width", 400);
+			showConfirmDialog(getMsgValue("pos_error_crm_offline_mode"), 'ERROR!', function() {
+				if (isHcEnabled) {
+					var accountId = CRMAccountModule.Hypercash.lastCustomerCardScanned != "" ? CRMAccountModule.Hypercash.lastCustomerCardScanned : getConfigValue('HC_NON_MEMBER_DEF_CARDNO');
+
+					console.log("Entering CRM offline mode | Customer card: ", accountId);
+					CRMAccountModule.Hypercash.activateCRMOfflineMode(accountId);
+				}
+			});
+
+			promptSysMsg();
+		}, 
+		/**
+		 * complete callback
+		 * */
+		function() {
+			clearInputDisplay();
+			isProCustScan = false;
+
+			/*// global function from cashier.js
+			renderCustomerInfo(profCust.customerName, profCust.customerNumber);	*/
+		});
+	}
+};
+
+CRMAccountModule.Hypercash = {
+	toggleCrmOfflineMode: false,
+	lastCustomerCardScanned: "",
+	crmOfflineMode: false,
+
+	resetCrmOfflineVariables: function() {
+		this.toggleCrmOfflineMode = false;
+		this.lastCustomerCardScanned = "";
+		this.crmOfflineMode = false;
+	},
+
+	/**
+	 *  
+	 */	
+	startProfCust : function(customer){
+		profCust = {};
+		profCust.customerNumber = customer.accountNumber;
+		profCust.businessName = (customer.businessName ? customer.businessName:'');
+		profCust.customerName = (customer.firstName ? customer.firstName:'') + ' ' + (customer.lastName ? customer.lastName :'');
+		profCust.customerPhone = (customer.contact ? customer.contact:'');
+		profCust.taxId = (customer.npwpId ? customer.npwpId:'');
+
+		profCust.taxName = this.getTaxName(customer);
+		profCust.taxAddress = (customer.npwpAddress ? customer.npwpAddress:'');
+		profCust.ktpId = (customer.ktpId ? customer.ktpId:'');
+		profCust.txnCode = customer.transactionCode ? customer.transactionCode : getConfigValue('HC_INV_DFLT_TXN_CODE');
+		profCust.memberType = this.getMemberType(customer);
+		promptSysMsg();
+	},
+	/**
+	 * 
+	 */
+	getMemberType : function(customer){
+		switch(customer.memberTypeDesc){
+			// PROFESSIONAL (memberType: MTYP003)
+			case 'PROFESSIONAL':
+			//	INDIVIDUAL (memberType: MTYP001)
+			case 'INDIVIDUAL' : 
+				// Not yet applied on CRM prod data: NON MEMBER GROSERINDO (memberType: MTYP004)
+				if(customer.accountNumber == getConfigValue('HC_NON_MEMBER_DEF_CARDNO')){
+					return 'NONMEMBER';
+				}
+				return 'PROFESSIONAL';
+			// EMPLOYEE (memberType: MTYP002)
+			case 'EMPLOYEE':
+				return 'EMPLOYEE';
+			default:
+				return 'MEMBER_TYPE_UNKNOWN';
+		}
+	},
+
+	//TODO Replace with customer.memberName
+	getTaxName : function(customer){
+		if (customer.npwpName) {
+			profCust.taxName = customer.npwpName;
+		} else if (customer.firstName || customer.lastName) {
+			var isComplete = customer.firstName && customer.lastName;
+			profCust.taxName = 	(customer.lastName ? customer.lastName : "") 
+								+ (isComplete ? ", " : "")
+								+ (customer.firstName ? customer.firstName : "");
+		}
+	},
+
+	activateCRMOfflineMode: function(accountId) {
+		$("#crmOffline-dialog").data("accountId", accountId)
+							   .dialog("open");
+	},
+
+	postCRMOfflineModeFunction: function() {
+		$("#crmOffline-dialog").dialog("close");
+
+		var accountId = $("#crmCustomerNumber").val();
+
+		/*	
+		 * If non-member, enter customer information for invoice
+		 */
+		if (accountId == getConfigValue('HC_NON_MEMBER_DEF_CARDNO')) {
+			Hypercash.service.enterCustomerInformation();
+		}
+	
+		CRMAccountModule.Hypercash.startProfCust({
+												  "accountNumber": 	accountId,
+												  "memberTypeDesc": $("#crmMemberTypes").val()
+												});
+
+		renderCustomerInfo(profCust.customerName, profCust.customerNumber);
+			
+		/** NOTE: 	Did not set values for availEmpLoyaltyPoints
+		 *		  	because customer was not checked in CRM service in the first place
+		 */
+		// Assign barcode as Customer Id for reward.
+		// global variable from cashier.js
+		customerIdForReward = accountId;
+		// global variable from cashier.js
+		//availEmpLoyaltyPoints = true;
+		runningNonMemberMarkup = 0;
+		this.crmOfflineMode = true;
+
+		$("authentication-form").dialog("option", "title", "Employee Authentication"); //revert authentication form title
+	}
+};

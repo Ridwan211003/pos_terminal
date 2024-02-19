@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+    <title>Standard Web View</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <link rel="stylesheet" type="text/css" media="screen, projection" href="/pos-web/resources/styles/screen.css" />
+    <link rel="stylesheet" type="text/css" media="print" href="/pos-web/resources/styles/print.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/pos-web/resources/styles/jQuery/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/pos-web/resources/styles/transretail.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/pos-web/resources/styles/calc_styles.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/pos-web/resources/styles/keyboard.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/pos-web/resources/styles/colorbox.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/pos-web/resources/styles/common.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/pos-web/resources/styles/addsTransition.css" />
+    <!-- The following styles and scripts are served from spring-js-resources-{ver}.jar -->
+
+
+
+    <script src="/pos-web/resources/js/lib/modernizr.custom.29837.js"></script>
+    <script src="/pos-web/resources/js/lib/jquery-1.8.3.min.js"></script>
+    <script src="/pos-web/resources/js/lib/jquery-ui.js"></script>
+    <script src="/pos-web/resources/js/lib/jquery.dateFormat-1.0.js"></script>
+    <script src="/pos-web/resources/js/lib/keyboard.js"></script>
+    <script src="/pos-web/resources/js/lib/tripledes.js"></script>
+    <script src="/pos-web/resources/js/lib/aes.js"></script>
+    <script src="/pos-web/resources/js/lib/pad-nopadding.js"></script>
+    <script src="/pos-web/resources/js/lib/pad-zeropadding.js"></script>
+    <script src="/pos-web/resources/js/lib/enc-utf16.js"></script>
+    <script src="/pos-web/resources/js/lib/enc-base64-min.js"></script>
+    <script src="/pos-web/resources/js/lib/jquery.quickpaginate.packed.js"></script>
+    <script src="/pos-web/resources/js/lib/jquery.ajax-progress.js"></script>
+    <script src="/pos-web/resources/js/commonDisplay.js"></script>
+
+    <script src="/pos-web/resources/js/common.js"></script>
+    <script src="/pos-web/resources/js/constants.js"></script>
+    <script src="/pos-web/resources/js/commons/ajaxGlobalHandler.js"></script>
+    <!-- MOVED TO cashier/main.html
+	 -->
+
+    <script src="/pos-web/resources/js/marketingAds.js"></script>
+    <!-- MLC 2017-04-21 -->
+    <script type="text/javascript" src="/pos-web/resources/js/lib/qrcode.min.js"></script>
+    <script type="text/javascript" src="/pos-web/resources/js/lib/jquery.qrcode.min.js"></script>
+    <script type="text/javascript" src="/pos-web/resources/js/lib/jquery-barcode.js"></script>
+    <script type="text/javascript" src="/pos-web/resources/js/lib/jquery-barcode.min.js"></script>
+    <!-- MLC 2017-04-21 -->
+
+
+    <script>
+        /*<![CDATA[*/
+        var posWebContextPath = '\/pos-web';
+        var loggedInUsername = '107';
+        var appBuildVersion = '2.0.0';
+        var messages = JSON.parse($.ajax({
+            url: posWebContextPath + "/sys/getMessages",
+            type: "GET",
+            async: false,
+            error: function(jqXHR, status, error) {
+                console.log("Error : " + error);
+            }
+        }).responseText);
+        /*]]>*/
+    </script>
+</head>
+
+<body class="tundra">
+    <div id="page" class="container">
+        <div id="content">
+            <div id="local" class="span-6">
+
+            </div>
+            <div id="main" class="span-18 last">
+                <div id="customer-container">
+                    <div class="sidebar1">
+                        <aside class="purchase-con-customer">
+                            <div id="buildversion" align="center" class="pos-clock"></div>
+                            <div id="clockDiv" class="pos-clock"></div>
+                            <h5 align="left">
+                                <br />Nama Kasir: <span id="givenName">Lena</span>&nbsp;<span id="lastName">Wahyuna</span>
+                            </h5>
+                            <div id="customerInfoDiv" class="customer"></div>
+                            <div class="line">
+                                <ul class="scan">
+                                    <li>Deskripsi</li>
+                                </ul>
+                            </div>
+                            <div id="scannedItemsDiv" class="scannedItems"></div>
+                            <h5></h5>
+                        </aside>
+
+                        <aside class="white">
+
+                            <div id="btmBoxProdName" class="prod prodBold"></div>
+                            <div id="btmBoxProdDesc" class="prod"></div>
+                            <div id="btmBoxProdPrice" class="prod"></div>
+
+                        </aside>
+                        <!-- end .column1 -->
+
+                    </div>
+
+                    <article class="content">
+                        <aside>
+                            <img class="img" src="display/displayLogo" width="250px" height="65px" />
+                            <!--<img class="img" src="../../../images/carrefour-logo.jpg"
+					th:attr="src=@{/images/carrefour-logo.jpg},title=#{logo},alt=#{logo}"
+					width ="250px" height="65px"
+					/>-->
+
+                        </aside>
+                        <aside class="midboxOnline">
+                            <div id="cashierProfile">
+                                <h4>Kasir Profile</h4>
+                                <p align="center">
+
+                                    <img id="emplPic" class="img" src="/pos-web/images/no-image.jpg" width="200px" height="200px" alt="??logo_in_ID??" title="??logo_in_ID??" />
+                                </p>
+                                <div class="cashierDetail">
+                                    <span id="givenName">Lena</span>&nbsp;<span id="lastName">Wahyuna</span><br />
+                                    <!--ID #: <span th:text="${session.POS_EMPLOYEE.employeeId}">ID #</span><br/>
+						Profile Type: <span th:text="${session.cashierProfile}">Cashier Profile</span>-->
+
+                                </div>
+                            </div>
+
+                            <div id="systemMessageDiv"></div>
+                        </aside>
+                        <aside class="white black-comment">
+                            <!--<div style="color: black">
+					<div id="customerFeedbackTitle" style="text-align: center; padding-top: 0px; text-transform: uppercase"></div>
+					<div style="float:left;width:35%">
+						<img id="customerFeedbackStatusHappyImg" class="img" src="/pos-web/resources/images/smiley-good.gif" width="92px" height="74px" />
+						<img id="customerFeedbackStatusSadImg" class="img" src="/pos-web/resources/images/smiley-sad.gif" width="92px" height="74px" />
+					</div>
+					<div style="float:right;width:60%;margin-left:5px;margin-right:5px">
+						<span id="customerFeedbackStatusText"></span>
+					</div>
+				</div>-->
+                        </aside>
+                        <aside class="blue">
+                            <div class="sub discCon">
+                                <div style="float: left; width: 40%">DISKON</div>
+                                <div style="float: right; width: 50%; text-align: right"><span id="totalDiscount">0</span></div>
+                            </div>
+                            <p class="sub">SUBTOTAL</p>
+                            <h1 id="subtotal">0</h1>
+                        </aside>
+                        <!-- end .column2 -->
+
+                    </article>
+
+                    <section>
+
+                        <aside class="advertisementCustomer white-ads">
+                            <p>
+
+                            </p>
+                        </aside>
+                        <aside class="advertisementCustomer red-ads">
+                            <p>
+
+                            </p>
+                        </aside>
+
+
+                    </section>
+                    <!-- **************************** CUSTOMER FEEDBACK DIALOG START *********************** -->
+
+                    <div id="customerFeedback-dialog" title="Customer Feedback" class="dialogFont">
+                        <p id="totalCmcDiscountMsg" class="cust-disc-message"></p>
+                        <p id="totalDiscountMsg" class="cust-disc-message"></p>
+                        <span id="feedbackMessage"></span>
+                        <p style="padding-left: 30px; padding-top: 10px">
+                            <img class="img" id="fnCustomerSatisfied" src="/pos-web/images/smiley-good-big.gif" width="152px" height="130px" alt="??logo_in_ID??" title="??logo_in_ID??" />
+                            <img class="img" id="fnCustomerNotSatisfied" src="/pos-web/images/smiley-sad-big.gif" width="152px" height="130px" alt="??logo_in_ID??" title="??logo_in_ID??" />
+                        </p>
+                        <p style="text-align: right; padding-right: 10px">Waktu: <span id="feedbackCounter" style="color: red; font-size: 26px"></span></p>
+                    </div>
+                    <!-- **************************** CUSTOMER FEEDBACK DIALOG END ************************* -->
+
+                    <div id="gift-card-balance-dialog" title="Gift Card Balance" class="dialogFont">
+                        <p id="giftcardBalanceSummary"></p>
+                    </div>
+                    <!-- **************************** CRM CUSTOMER ENTER PIN START *********************** -->
+
+                    <div id="crmEnterPIN-dialog" title="PLEASE ENTER YOUR PIN">
+                        <span id="crmEnterPinMsgSpan" class="error-message"></span>
+                        <label>ENTER PIN:</label><input type="password" id="crmEnterPinField" class="textBox" />
+                        <span class="button-dialog">
+				<button id="crmPinEnterBtn">ENTER</button>
+			</span>
+                    </div>
+                    <div id="crm-message" title="Information" class="dialogFont">
+                        <p id="crmMsgReminder" class="modalMessage"></p>
+                    </div>
+                    <!-- **************************** CRM CUSTOMER ENTER PIN END *********************** -->
+
+                    <div id="flashizQRCode-dialog" title="" class="dialogFont">
+                        <!-- <h4 style="margin: auto;">SCAN PADA APLIKASI MOBILE</h4> -->
+                        <img id="flasizQRCode-img" src="/pos-web/images/qris-logo.jpeg" width="250px" height="80px" />
+                        <div id="flashizQRCode-canvas"></div>
+                        <p id="midQrisTeks" style="text-align: center;"></p>
+                    </div>
+                    <!-- *********************** Balloon game redemption dialog start *******************  -->
+
+                    <div id="ovoQRCode-dialog" title="" class="dialogFont">
+                        <img id="ovoQRCode-img" src="/pos-web/images/ovo-logo.jpeg" width="250px" height="80px" />
+                        <div id="ovoQRCode-canvas"></div>
+                        <p id="midOvoTeks" style="text-align: center;font-size: 11px;"></p>
+                        <p id="ovoQRCodeExpired" style="text-align: center;font-size: 11px;"></p>
+                    </div>
+                    
+                    <div id="allotopupBarcode-dialog" title="" class="dialogFont">
+                        <!-- <h4 style="margin: auto;">SCAN PADA APLIKASI MOBILE</h4> -->
+                        <!-- <img id="flasizQRCode-img" src="/pos-web/images/qris-logo.jpeg" width="250px" height="80px" /> -->
+                        <div id="allotopupBarcode-canvas"></div>
+                        <!-- <p id="allotopupBarcode-teks" style="text-align: center;"></p> -->
+                    </div>
+
+                    <div id="altoWeChatQRCode-dialog" class="dialogFont">
+                        <h4 style="margin: auto;">SCAN THIS ON WECHAT/ALIPAY</h4>
+                        <img id="altoWeChatQRCode-img" src="" width="393px" height="500px" />
+                    </div>
+
+
+                    <div id="balloonGameItemRedemption-dialog" class="dialogFont">
+                        <span id="balloonGameRedemptionErrorSpan" class="error-message"></span>
+                        <span id="balloonRedemptionItemLimitInfo"></span>
+                        <p>Greyed out item/s indicate that the product from one of the principals should be purchased in order to redeem the free item.</p>
+                        <table id="balloonGameRedemptionTable">
+                        </table>
+                        <div id="balloonNavPanel">
+                            <button id="balloonPreviousBtn" style="float: left">PREVIOUS</button>
+                            <button id="balloonNextBtn" style="float: right">NEXT</button>
+                        </div>
+                    </div>
+                    <div id="balloonGameUser-dialog" title="PLEASE ENTER YOUR USER ID">
+                        <span id="balloonGameUserErrorSpan" class="error-message"></span>
+                        <label>USER ID:</label><input type="text" id="balloonGameUserText" class="textBox" />
+                    </div>
+                    <!-- *********************** Balloon game redemption dialog end *******************  -->
+                    <!-- end .container -->
+
+                    <!-- // INHOUSEVOUCHER 2017-04-13 -->
+                    <div id="voucherInfo-dialog" title="Inhouse Voucher Information" class="dialogFont">
+                        <span id="voucherInfoMsg" class="error-message"></span>
+                        <div class="modalMessage"><label>Voucher Number:&nbsp;&nbsp;</label><span id="voucherNumberInfo"></span></div><br />
+                        <div class="modalMessage"><label>Voucher Amount:&nbsp;&nbsp;</label><span id="voucherAmountInfo"></span></div><br />
+                        <div class="modalMessage"><label>Expired Date:&nbsp;&nbsp;</label><span id="voucherExpDateInfo"></span></div><br />
+                        <div class="modalMessage"><label>Voucher Status:&nbsp;&nbsp;</label><span id="voucherStatusInfo"></span></div><br />
+                    </div>
+                    <!-- // INHOUSEVOUCHER 2017-04-13 -->
+
+                    <div id="eventInfo-dialog" title="Promo Information" class="dialogFont">
+                        <div class="modalMessage"><label><h4>Cek Struk Belanja Anda:</h4></label></div>
+                        <div class="modalMessage" id="eventInfo-dialog-content"></div>
+                    </div>
+
+                </div>
+                <div id="customer-idle-container">
+                    <div class="sidebar1">
+                        <aside class="nextCustomerCon white-ads">
+                            <p>
+
+
+
+                            </p>
+                        </aside>
+                        <!-- end .column1 -->
+
+                    </div>
+                    <!-- ELEBOX !-->
+                    <div id="donationCustomer-dialog" title="Donation Dialog" class="dialogFont">
+                        <div class="form-group col-md-12">
+
+                        </div>
+                        <div class="form-group col-md-12">
+                            <div id="returnInfoTable" class="table-responsive">
+                                <table class="table table-border" style="border-spacing: 1px !important;">
+                                    <thead id="donationTableHeadCustomer">
+                                    </thead>
+                                    <tbody id="donationTableBodyCustomer">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="eleboxCustomer-dialog" title="MCASH Order Information" class="dialogFont">
+                        <div class="modalMessage"><label>Order Id: &nbsp;&nbsp;</label><span id="eleboxOrderIdCustomer"></span></div><br />
+                        <div class="modalMessage"><label>Customer ID: &nbsp;&nbsp;</label><span id="eleboxCustomerIdCustomer"></span></div><br />
+                        <div class="modalMessage"><label></label><span id="eleboxCustomerDataCustomer" style="white-space:pre"></span></div><br />
+                    </div>
+                    <div id="eleboxStatus-dialog" title="MCASH Order Information" class="dialogFont">
+                        <div class="modalMessage" align="center"><label>Transaksi sudah dibayar</label></div><br />
+                        <div class="modalMessage"><label>Order Id: &nbsp;&nbsp;</label><span id="eleboxInfoId"></span></div><br />
+                        <div class="modalMessage"><label><span id="eleboxCusInfo" style="white-space:pre"></span></div><br />
+			</div> 
+			<div id="eleboxFailedStatus-dialog" title="MCASH Order Information" class="dialogFont">
+				<div class="modalMessage" align="center"><label>Transaction Failed. Contact Customer Services for Return. </label></div><br />
+                        <div class="modalMessage"><label>Order Id: &nbsp;&nbsp;</label><span id="eleboxFailedId"></span></div><br />
+                        <div class="modalMessage"><label><span id="eleboxFailedInfo" style="white-space:pre"></span></div><br />
+			</div> 
+			<div id="bpjs-dialog" title="BPJS KS Order Information" class="dialogFont">
+				<div class="modalMessage"><label>Response Code: &nbsp;&nbsp;</label><span id="bpjsResponseCode"></span></div><br />
+                        <div class="modalMessage"><label>Response Msg: &nbsp;&nbsp;</label><span id="bpjsResponseMsg"></span></div><br />
+                        <div class="modalMessage"><label></label><span id="bpjsInfoVaKel" style="white-space:pre"></span></div>
+                        <div class="modalMessage"><label></label><span id="bpjsInfoVaKepkel" style="white-space:pre"></span></div>
+                        <div class="modalMessage"><label></label><span id="bpjsInfoNama" style="white-space:pre"></span></div>
+                        <div class="modalMessage"><label></label><span id="bpjsInfoAnggota" style="white-space:pre"></span></div>
+                        <div class="modalMessage"><label></label><span id="bpjsInfoPeriode" style="white-space:pre"></span></div>
+                        <div class="modalMessage"><label></label><span id="bpjsInfoPremi" style="white-space:pre"></span></div>
+                        <div class="modalMessage"><label></label><span id="bpjsInfoAdmin" style="white-space:pre"></span></div>
+                    </div>
+                    <div id="bpjsAdvice-dialog" title="BPJS Advice Information" class="dialogFont">
+                        <div class="modalMessage"><label>Response Code: &nbsp;&nbsp;</label><span id="adviceResponseCode"></span></div><br />
+                        <div class="modalMessage"><label>Response Msg: &nbsp;&nbsp;</label><span id="adviceResponseMsg"></span></div><br />
+                        <div class="modalMessage"><label>Account Number: &nbsp;&nbsp;</label><span id="adviceAccount"></span></div><br />
+                        <div class="modalMessage"><label>Payment Status: &nbsp;&nbsp;</label><span id="adviceStatus"></span></div><br />
+                    </div>
+                    <div id="simpatindoInfo-dialog" title="SIMPATINDO Information" class="dialogFont">
+                        <div class="modalMessage"><label>Response Code: &nbsp;&nbsp;</label><span id="simpatindoInfoResponseCode"></span></div><br />
+                        <div class="modalMessage"><label>Response Msg: &nbsp;&nbsp;</label><span id="simpatindoInfoResponseMsg"></span></div><br />
+                        <div class="modalMessage"><label></label><span id="simpatindoInfoResponseScreen" style="white-space:pre"></span></div><br />
+                        <div class="modalMessage"><label>Apakah anda sudah yakin dengan data di atas ? &nbsp;&nbsp;</label></div><br />
+                    </div>
+                    <div id="simpatindoAdvice-dialog" title="SIMPATINDO Advice Information" class="dialogFont">
+                        <div class="modalMessage"><label>Response Code: &nbsp;&nbsp;</label><span id="simpatindoAdviceResponseCode"></span></div><br />
+                        <div class="modalMessage"><label>Response Msg: &nbsp;&nbsp;</label><span id="simpatindoAdviceResponseMsg"></span></div><br />
+                        <div class="modalMessage"><label></label><span id="simpatindoAdviceResponseScreen" style="white-space:pre"></span></div>
+                    </div>
+                    <div id="custLoyalty_mail_info2-dialog" title="Customer Data" class="dialogFont">
+                        <div class="modalMessage"><label>No. HP: &nbsp;&nbsp;</label><span id="custLoyalty_mail_info_hp"></span></div><br />
+                        <div class="modalMessage"><label>Nama: &nbsp;&nbsp;</label><span id="custLoyalty_mail_info_nama"></span></div><br />
+                        <div class="modalMessage"><label>email: &nbsp;&nbsp;</label><span id="custLoyalty_mail_info_email"></span></div><br />
+                    </div>
+
+                    <article class="content">
+                        <aside>
+                            <img class="img" src="display/displayLogo" width="250px" height="65px" />
+                            <!--<img class="img" src="../../../images/carrefour-logo.jpg"
+					th:attr="src=@{/images/carrefour-logo.jpg},title=#{logo},alt=#{logo}"
+					width ="250px" height="65px"
+					/>-->
+
+                        </aside>
+                        <aside class="whiteOpen " style="height:105px !important;">
+                            <p class="openCashier">
+                                KASIR BUKA.
+                                <BR />CUSTOMER SELANJUTNYA!
+                            </p>
+                        </aside>
+                        <aside class="midboxCustomer" style="height: 353px !important;">
+                            <h4>KASIR PROFILE</h4>
+                            <p align="center">
+
+                                <img id="emplPic" class="img" src="/pos-web/images/no-image.jpg" width="200px" height="200px" alt="??logo_in_ID??" title="??logo_in_ID??" />
+                            </p>
+                            <div class="cashierDetail">
+                                <span id="givenName">Lena</span>&nbsp;<span id="lastName">Wahyuna</span>
+                                <!--ID #: <span th:text="${session.POS_EMPLOYEE.employeeId}">ID #</span><br/>
+					Profile Type: <span th:text="${session.cashierProfile}">Cashier Profile</span>-->
+
+                            </div>
+                            <div style="color: black">
+                                <div id="customerFeedbackTitle" style="text-align: center; padding-top: 0px; text-transform: uppercase"></div>
+                                <div style="float:left;width:35%">
+                                    <img id="customerFeedbackStatusHappyImg" class="img" src="/pos-web/resources/images/smiley-good.gif" width="92px" height="74px" />
+                                    <img id="customerFeedbackStatusSadImg" class="img" src="/pos-web/resources/images/smiley-sad.gif" width="92px" height="74px" />
+                                </div>
+                                <div style="float:right;width:60%;margin-left:5px;margin-right:5px; margin-top: 5px;">
+                                    <span id="customerFeedbackStatusText"></span>
+                                </div>
+                            </div>
+                        </aside>
+                        <!-- end .column2 -->
+
+                    </article>
+
+                    <section>
+                        <aside class="nextCustomerCon red-ads">
+                            <p>
+
+
+
+                            </p>
+                        </aside>
+                    </section>
+                    <!-- end .container -->
+
+                </div>
+
+                <!-- CHECK PRICE -->
+                <div id="itemCheck-dialog" title="CHECK PRICE" class="dialogFont">
+                    <table border="0">
+                        <tbody>
+                            <tr style="display: block;margin-bottom: 5px">
+                                <td style="width: 100px;">BARCODE</td>
+                                <td>:</td>
+                                <td id ="itemBarcode"></td>
+                            </tr>
+                            <tr style="display: block;margin-bottom: 5px">
+                                <td style="width: 100px;">NAME</td>
+                                <td>:</td>
+                                <td id ="itemName"></td>
+                            </tr>
+                            <tr style="display: block;;margin-bottom: 5px">
+                                <td style="width: 100px;">PRICE</td>
+                                <td>:</td>
+                                <td id ="itemPrice"></td>
+                            </tr>
+                            <tr style="display: block;">
+                                <td style="width: 100px;">PROMO PRICE</td>
+                                <td>:</td>
+                                <td id ="afterPrice"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="customer-tempoff-container">
+                    <div class="offlineSidebarCustomer">
+                        <aside class="offlineMessageLogo">
+                            <img src="display/displayLogo" width="250px" height="65px" />
+                            <!--<img src="../../../images/carrefour-logo.jpg"
+					th:attr="src=@{/images/carrefour-logo.jpg},title=#{logo},alt=#{logo}"
+					width ="250px" height="65px" />-->
+
+                        </aside>
+                        <aside class="offlineMessageCenter centerOff">
+                            <p class="offCashier offHgt" style="padding-top: 70px;">SILAHKAN MELAKUKAN TRANSAKSI DI KASIR YANG TERSEDIA</p>
+                        </aside>
+                        <aside class="offlineMessageCenter btmOff">
+                            <p class="regClosed offHgtbtm">KASIR TUTUP</p>
+                        </aside>
+                    </div>
+                    <section>
+                        <aside class="offlineCashier red-ads">
+                            <p>
+
+
+
+                            </p>
+                        </aside>
+                    </section>
+                </div>
+
+                <script src="/pos-web/resources/js/lib/socket.io.min.js"></script>
+                <script src="/pos-web/resources/js/customer.js"></script>
+                <script src="/pos-web/resources/js/commonDisplay.js"></script>
+                <script src="/pos-web/resources/js/giftCard.js"></script>
+                <script src="/pos-web/resources/js/hypercash/fo/hcmodule.js"></script>
+                <script src="/pos-web/resources/js/balloongame.js"></script>
+                <script src="/pos-web/resources/js/hotspice/fo/hotspiceModule.js"></script>
+                <script src="/pos-web/resources/js/giftCard-mms.js"></script>
+                <script src="/pos-web/resources/js/posDialogs.js"></script>
+
+            </div>
+        </div>
+        <!-- 
+	    <div id="popup-message-dialog" title="Warning!">
+		    <p id="dialogMsg" class="modalMessage"></p>
+		</div>
+	    -->
+
+        <div id="popup-confirm-dialog" title="Information">
+            <p id="dialogConfirm" class="modalMessage"></p>
+        </div>
+
+        <script>
+            if ($("#clockDiv").length > 0) {
+                // invoke clock method
+                clock();
+            }
+        </script>
+    </div>
+</body>
+
+</html>

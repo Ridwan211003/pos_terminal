@@ -1,0 +1,95 @@
+Homedelivery.Page5CompleteDialogView = Backbone.View.extend({
+	tagName : 'div',
+	className : 'completeDialog',
+	
+	initialize : function(){
+<<<<<<< HEAD
+		_(this).bindAll('render', 'openDialog', 'complete', 'completed', 'logIn', 'logInOk', 'logInFail');
+=======
+		_(this).bindAll('render', 'openDialog', 'complete', 'completed');
+>>>>>>> 1.7
+		var source = $('#CompleteDialogTemplate').html();
+		var template = Handlebars.compile(source);
+		this.$el.append(template(this.model.toJSON()));
+		this.$el.dialog(hdSettings.completeDialog);
+	},
+	
+	render : function(){
+		return this.$el;
+	},
+	
+	openDialog : function(){
+<<<<<<< HEAD
+		this.$('.authResult').hide();
+		this.$('.authResultContainer').show();
+		this.$('.authUser').val('');
+		this.$('.authUser').removeAttr('readonly');
+		$('.ui-dialog-buttonpane button:contains("Complete Delivery")').button().hide();
+		$('.ui-dialog-buttonpane button:contains("Log-in")').button().show();
+		this.$el.data('model', this.model).data('view', this).dialog('option', 'title', 'Supervisor Log-in').dialog('open');
+=======
+		this.$('.completeResult').hide();
+		$('.ui-dialog-buttonpane button:contains("Complete Delivery")').button().show();
+		this.$el.data('model', this.model).data('view', this).dialog('option', 'title', 'Complete Order# ' + this.model.get('hdTransactionId')).dialog('open');
+>>>>>>> 1.7
+	},
+	
+	complete : function(){
+		ajax.updateOrderStatusComplete({
+			hdTransactionId : this.model.get('hdTransactionId')
+		}, this.completed);
+	},
+	
+	completed : function(result){
+		this.$('.completeResult').hide();
+		switch(result.status){
+			case 'COMPLETED' : 
+				this.$('.completeSuccess').show();
+				$('.ui-dialog-buttonpane button:contains("Complete Delivery")').button().hide();
+				this.$('.authResult').text('Order is now completed.');
+				this.model.set('status', result.status);
+				break;
+			case 'COULD_NOT_COMPLETE' :
+				this.$('.couldNotComplete').show();
+				break;
+			default : 
+				console.log('default complete' + result);
+				break;
+		}
+<<<<<<< HEAD
+	},
+	
+	logIn : function(){
+		username = this.$('.dialogUsername').val();
+		password = this.$('.dialogPassword').val();
+		if(username == '' || password == ''){
+			this.$('.authResult').text('Username and password required').show();
+		} else {
+			this.$('.authResult').text('').show();
+			var view = this;
+			ajax.authUser({
+				username : this.$('.dialogUsername').val(),
+				empCode : this.$('.dialogPassword').val(),
+				authType : 'pin',
+				roles : ['ROLE_HD_SUPERVISOR']
+			}, this.logInOk , this.logInFail);			
+		}
+	},
+	
+	logInOk : function(data){
+		this.$('.authResult').text(data.msg);
+		if(data.msg == 'OK'){
+			this.$el.dialog('option', 'title', 'Complete Delivery Order# ' + this.model.get('hdTransactionId'));
+			this.$('.authUser').attr('readonly', 'readonly');
+			this.$('.authResult').text('Login successful. You may complete the delivery order now.');
+			$('.ui-dialog-buttonpane button:contains("Complete Delivery")').button().show();
+			$('.ui-dialog-buttonpane button:contains("Log-in")').button().hide();
+		}
+	},
+	
+	logInFail : function(errorData){
+		this.$('.authResult').text(errorData.error).show();
+=======
+>>>>>>> 1.7
+	}
+});

@@ -1,0 +1,434 @@
+/**
+ * Created by mperez@exist.com
+ * Exist Global Inc.
+ */
+var Q = require('q');
+var printerUtil = require('./printer-util');
+//var config = require('../../config/config');
+var config = {};
+var printer = require('../../devices/printer');
+
+var PAPER_FULL_CUT='\x1b\x69';
+var PAPER_PART_CUT='\x1b\x6d';
+
+// INHOUSE VOUCHER 2017-04-13
+//var VOUCHER_BARCODE = '\x1b\x44\x04\x00\x09\x1d\x68\x08\x1d\x77\x03\x1d\x6b\x49';
+var VOUCHER_BARCODE = '\x1d\x77\x02\x1d\x6b\x49';
+var VOUCHER_BARCODE_MODE = '\x7b\x43';
+// INHOUSE VOUCHER 2017-04-13
+
+var PrinterQueue = {};
+PrinterQueue.delay = 300;//default;
+/**
+ * initialize queue settings such as delay
+ * @param terminalConf - configuration data
+ */
+PrinterQueue.init = function(cf, terminalConf){
+    try{
+	config = cf;
+        var printerDelay = parseInt(terminalConf.properties['PRINTER_DELAY']);
+
+        this.delay = printerDelay == null ? this.delay : printerDelay;
+        console.log("Printer Delay: " + this.delay);
+
+        return this;
+    } catch (err){
+        console.log(err);
+    }
+}
+
+/**
+ * Print Receipt in Queue or with time delay
+ * @param txData
+ * @returns {string}
+ */
+PrinterQueue.printReceiptQueued = function(txData){
+    var printStatus = "Printing Receipt in Queue Started.";
+
+    try {
+        //Print Flow
+        var queue = [];
+        var printProcesses = [];
+
+        // Header
+        if (txData.header) {
+            var header = new ReceiptPart(txData.header);
+
+            queue.push(header);
+            printProcesses.push(processQueue);
+        }
+
+        if (txData.title) {
+            var title = new ReceiptPart(txData.title);
+
+            queue.push(title);
+            printProcesses.push(processQueue);
+        }
+
+        /*** BODY OF RECEIPT***/
+        // Tx Items Scanned
+        if (txData.txDetail) {
+            var details = new ReceiptPart(txData.txDetail);
+
+            queue.push(details);
+            printProcesses.push(processQueue);
+        }
+
+        // Tx Payment Details
+        if (txData.body) {
+            var body = new ReceiptPart(txData.body);
+
+            queue.push(body);
+            printProcesses.push(processQueue);
+        }
+
+        // Tx Summary Details
+        if (txData.summary) {
+            var summary = new ReceiptPart(txData.summary);
+
+            queue.push(summary);
+            printProcesses.push(processQueue);
+        }
+
+        // TopUp Info Details
+        if (txData.topUpInfo) {
+		for(var d in txData.topUpInfo)
+		{
+			var data = txData.topUpInfo[d];
+			if(data.constructor === Array)
+			{
+				var topUp = new ReceiptPart(data);
+				queue.push(topUp);
+				printProcesses.push(processQueue);
+			}
+			else
+			{
+				var topUp = new ReceiptPart(txData.topUpInfo);
+				queue.push(topUp);
+				printProcesses.push(processQueue);
+				break;
+			}
+		}
+        }
+
+        if (txData.footerSummary) {
+            var footerSummary = new ReceiptPart(txData.footerSummary);
+            queue.push(footerSummary);
+            printProcesses.push(processQueue);
+        }
+
+        // INHOUSE VOUCHER 2017-04-13
+        if (txData.footer) {
+            //adds spaces and cut command
+            if(!txData.freeParking && !txData.mlc && !(txData.voucherData && typeof txData.voucherData.marketingVoucherObj != 'undefined')){ // CR MLC
+                txData.footer = txData.footer.concat(printerUtil.cutPaperReceipt(config.isThermal));
+            }
+            var footer = new ReceiptPart(txData.footer);
+
+            queue.push(footer);
+            printProcesses.push(processQueue);
+        }
+
+		//voucher
+        if (txData.voucherData && typeof txData.voucherData.marketingVoucherObj != 'undefined')
+		{
+			var voucher = [];
+			var vouchers = txData.voucherData.marketingVoucherObj.voucherList;
+			var voucherAmount = txData.voucherData.marketingVoucherObj.voucherAmt;
+			var voucherExp = txData.voucherData.marketingVoucherObj.expDate;
+			var footerLines = txData.voucherData.marketingVoucherObj.promoCouponTemplate;
+			
+			for(var b in vouchers)
+			{
+				var data = '0' + vouchers[b];
+				var i = 0;
+				
+				voucher.push({'position':'centered', 'val':'--  --  --  --  --  --  --  --  --  --'});
+				voucher.push(printerUtil.newLine());
+				voucher.push({'position':'centered', 'val': ((config.isThermal) ? '\x1b\x21\x08' : '\x1b\x21\x10') + '    VOUCHER: Rp ' + voucherAmount  + ((config.isThermal) ? '\x1b\x21\x00' : '\x1b\x21\x01') + '\x1b\x33\x30\x1b\x4d\x01' + ((config.isThermal) ? '' : '\x1b\x32')});
+				//voucher.push({'position':'centered', 'val': ((config.isThermal) ? '\x1b\x21\x08' : '') + '    VOUCHER: Rp ' + voucherAmount  + ((config.isThermal) ? '\x1b\x21\x00\x1b\x33\x30\x1b\x4d\x01' : '')});
+				voucher.push({'position':'centered', 'val': ' Exp.Date: ' + voucherExp});
+				voucher.push(printerUtil.newLine());
+				
+				if (config.isThermal)
+				{
+					var barcode = VOUCHER_BARCODE_MODE;
+					do
+					{
+					  var ch = data[i] + data[i+1];
+					  barcode += String.fromCharCode(parseInt(dechex(ch), 16));
+					  i += 2;
+					} while(i < data.length);
+				
+					barcode = String.fromCharCode(parseInt(dechex('' + barcode.length), 16)) + barcode;
+					
+					voucher.push(printerUtil.printerCommand(VOUCHER_BARCODE + barcode + '\x1b\x44\x00'));
+					//voucher.push(printerUtil.printerCommand(VOUCHER_BARCODE + barcode));
+				}
+				
+				voucher.push({'position':'centered', 'val': '  ' + data.substr(1)});
+				voucher.push(printerUtil.newLine());
+				
+				// FOOTER
+				for (var l in footerLines)
+				{
+					var f = footerLines[l];
+					voucher.push({'position':'left', 'val': f.substr(0, 40)});
+				}
+				voucher.push(printerUtil.newLine());
+			}
+			
+			if(!txData.freeParking)
+				voucher = voucher.concat(printerUtil.cutPaperReceipt(config.isThermal));
+				
+            queue.push(new ReceiptPart(voucher));
+            printProcesses.push(processQueue);
+        }
+	// INHOUSE VOUCHER 2017-04-13
+
+        //freeParking
+        if (txData.freeParking) {
+            //adds spaces and cut command
+            if (config.isThermal) {
+                txData.freeParking.unshift(printerUtil.newLine());
+                txData.freeParking.unshift(printerUtil.newLine());
+                txData.freeParking.splice(txData.freeParking.length - 5,0, printerUtil.printerCommand(PAPER_PART_CUT));
+            } else {
+                txData.freeParking.splice(txData.freeParking.length - 2,0, printerUtil.printerCommand(PAPER_PART_CUT));
+                //txData.freeParking.splice(0,0, printerUtil.printerCommand(PAPER_PART_CUT));
+            }
+            if(!txData.mlc) txData.freeParking = txData.freeParking.concat(printerUtil.cutPaperReceipt(config.isThermal));
+            var freeParking = new ReceiptPart(txData.freeParking);
+
+            queue.push(freeParking);
+            printProcesses.push(processQueue);
+        }
+	
+	// CR MLC
+ 	if (txData.mlc) {
+            //adds spaces and cut command
+            if (config.isThermal) {
+                // CR MLC ADD SIGN
+                txData.mlc.splice(txData.mlc.length - 9,0, printerUtil.printerCommand(PAPER_PART_CUT));
+                // CR MLC ADD SIGN
+                //console.log("masuk printer");
+            } else {
+                txData.mlc.splice(txData.mlc.length - 2,0, printerUtil.printerCommand(PAPER_PART_CUT));
+                //txData.freeParking.splice(0,0, printerUtil.printerCommand(PAPER_PART_CUT));
+            }
+            txData.mlc = txData.mlc.concat(printerUtil.cutPaperReceipt(config.isThermal));
+            var mlc = new ReceiptPart(txData.mlc);
+
+            queue.push(mlc);
+            printProcesses.push(processQueue);
+        }
+	// CR MLC
+
+        //balloonGame
+        if (txData.balloonGame) {
+            //adds spaces and cut command
+            txData.balloonGame = txData.balloonGame.concat(printerUtil.cutPaperReceipt(config.isThermal));
+            var balloonGame = new ReceiptPart(txData.balloonGame);
+
+            queue.push(balloonGame);
+            printProcesses.push(processQueue);
+        }
+
+        //eft online printing
+        if (txData.eftOnline) {
+            //adds spaces and cut command
+            txData.eftOnline = txData.eftOnline.concat(printerUtil.cutPaperReceipt(config.isThermal));
+            var eft = new ReceiptPart(txData.eftOnline);
+
+            queue.push(eft);
+            printProcesses.push(processQueue);
+        }
+
+        if(txData.isInstallmentTransaction){
+            /*var installment = new ReceiptPart(txData.isInstallmentTransaction);
+            queue.push(installment);*/
+            printProcesses.push(printInstallmentInQueue);
+        }
+
+        /**Eft Reports START**/
+        if(txData.eftSettlementAll){
+            //adds spaces and cut command
+            txData.eftSettlementAll = (txData.eftSettlementAll).concat(printerUtil.cutPaperReceipt(config.isThermal));
+            var eftSettlement = new ReceiptPart(txData.eftSettlementAll);
+
+            queue.push(eftSettlement);
+            printProcesses.push(processQueue);
+        }
+
+        if(txData.eftTransactionSummaryData){
+            //adds spaces and cut command
+            txData.eftTransactionSummaryData = (txData.eftTransactionSummaryData).concat(printerUtil.cutPaperReceipt(config.isThermal));
+            var eftTransactionSummary = new ReceiptPart(txData.eftTransactionSummaryData);
+
+            queue.push(eftTransactionSummary);
+            printProcesses.push(processQueue);
+        }
+
+        if(txData.eftDetailTransactionReport){
+            //adds spaces and cut command
+            txData.eftDetailTransactionReport = (txData.eftDetailTransactionReport).concat(printerUtil.cutPaperReceipt(config.isThermal));
+            var eftDetailTransactionReport = new ReceiptPart(txData.eftDetailTransactionReport);
+
+            queue.push(eftDetailTransactionReport);
+            printProcesses.push(processQueue);
+        }
+        /**Eft Reports END**/
+
+        //Adds stopPrintingReceipt at the last element in queue
+        if(!txData.isInstallmentTransaction){
+            printProcesses.push(stopPrintingReceipt);
+        }
+
+        //Set processQueue Params
+        var printingProcessParams = {
+            delay        : 0,
+            queue        : queue,
+            txData       : txData
+        };
+
+        //Processes printProcesses array sequentially
+        if(printProcesses.length > 0){
+            var result = Q(printingProcessParams);
+            printProcesses.forEach(function(p) {
+                result = result.then(p);
+            });
+        }
+
+        return printStatus;
+    } catch (err) {
+        console.log(err.message);
+        console.log("Unable to print receipt");
+        printStatus = "Unable to print receipt;";
+        return printStatus;
+    }
+};
+
+/**
+ * ReceiptPart
+ * - part of receipt containing its data
+ * - add properties to receipt for additional options
+ */
+var ReceiptPart = function ReceiptPart(items){
+    this.items = items;
+};
+
+/*****************************************
+ * Q Implementation of printing --> START
+ * Process Flow
+ *****************************************/
+/**
+ * Processes Receipt Component inside the Array/Queue
+ * @param params contains:
+ *  count        : 0,
+ *  queue        : queue,
+ *  txData       : txData
+ * @returns {promise}
+ *    - tracks params updated data and pass to next item in Array/Queue
+ */
+var processQueue = function(params) {
+    var items = null;
+    var deferred = Q.defer();
+
+    try {
+        setTimeout(function () {
+            items = params.queue[0].items;
+
+            var result = Q(items);
+            for (var count = 0; count < items.length; count++) {
+                result = result.then(printItemsInQueue);
+            }
+            //time delay for the next queue to execute
+            params.delay = count;
+            params.queue = params.queue.splice(1);
+            deferred.resolve(params);
+        }, params.delay * PrinterQueue.delay);
+
+    } catch (err){
+        console.log("Error caught on processQueue: " + err);
+    }
+    return deferred.promise;
+};
+
+/**
+ * Prints the items sequentially
+ * @param items
+ *  -- actual data of the receipt component that is printed.
+ * @returns {promise}
+ *  -- return value is the items that are not yet printed.
+ */
+var printItemsInQueue = function(items) {
+    var deferred = Q.defer();
+
+    setTimeout(function() {
+        //console.log("Test: " + JSON.stringify(items[0]));
+        printer.printItem(items[0]);
+        deferred.resolve(items.splice(1));
+    }, PrinterQueue.delay);
+
+    return deferred.promise;
+};
+
+/**
+ * printInstallmentInQueue
+ *    - In queue that processes installment receipt
+ * @param params
+ */
+var printInstallmentInQueue = function(params){
+    var installment = null;
+    var deferred = Q.defer();
+
+    try {
+        setTimeout(function () {
+            if(params && params.txData && params.txData.isInstallmentTransaction){
+                installment = params.txData.isInstallmentTransaction;
+                PrinterQueue.printReceiptQueued(installment);
+            }
+        }, params.delay * PrinterQueue.delay);
+
+        deferred.resolve();
+    } catch (err){
+        console.log("Error caught on processQueue: " + err);
+    }
+    return deferred.promise;
+};
+
+//Sends the status of the printer
+var stopPrintingReceipt = function(params){
+    var deferred = Q.defer();
+
+    setTimeout(function(){
+        printer.sendPrintingStatus(false);
+    }, params.delay * PrinterQueue.delay);
+
+    return deferred.promise;
+};
+
+// INHOUSE VOUCHER 2017-04-13
+function dechex(d, padding)
+{
+    var hex = Number(d).toString(16);
+    padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
+
+    while (hex.length < padding) {
+        hex = "0" + hex;
+    }
+
+    return hex;
+}
+
+function numberWithCommas(val) {
+        var renderedVal = new String(val);
+        return renderedVal.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+// INHOUSE VOUCHER 2017-04-13
+
+/*****************************************
+ * Q Implementation of printing --> END
+ * Process Flow
+ *****************************************/
+module.exports = PrinterQueue;

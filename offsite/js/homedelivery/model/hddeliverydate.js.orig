@@ -1,0 +1,47 @@
+Homedelivery.HdDeliveryDate = Backbone.Epoxy.Model.extend({
+	initialize : function(){
+	},
+	
+	defaults : {
+<<<<<<< HEAD
+=======
+		originalDeliveryDate : '',
+>>>>>>> 1.7
+		deliveryDate : '',
+		complete : false
+	},
+	
+	computeds: {
+		formComplete : {
+			deps : ["deliveryDate"],
+			get : function(deliveryDate) {
+				this.set('complete', !!deliveryDate);
+			}
+<<<<<<< HEAD
+		} 
+	}
+=======
+		},
+		deliveryDateValid : {
+			deps : ['originalDeliveryDate', 'deliveryDate'],
+			get : function(originalDeliveryDate, deliveryDate){
+				if(!deliveryDate){
+					return '*';
+				} else {
+					if(!!originalDeliveryDate){
+						if(originalDeliveryDate.dateFormat('d/m/Y H:i') === deliveryDate){
+							this.set('complete', false);
+							return ' must not be the same as original Delivery Date';
+						} else {
+							return ''; 
+						}
+					}  else {
+						return '';
+					}
+				}
+			}
+		}
+	},
+
+>>>>>>> 1.7
+});

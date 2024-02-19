@@ -1,0 +1,465 @@
+/**
+ * Author: Owie
+ * EpsonPrinter Module
+ * 
+ * Contains printFile functions will calls phantom module to render page to print
+ * and 'spawn' new child_process to call native Unix lp command to print
+ * rendered document using "Epson"-registered printer
+ * 
+ *  module elements:
+ *  printTaxInvoice => Calls printDoc function and pass printTaxInvoicePage as parameter
+ *  				Used when printing taxInvoice the first time.
+ *  reprintTaxInvoice => Calls printDoc function to reprint previous transaction
+ *  printReturnNote => Prints returnNote
+ */
+
+/**
+ * Will be assigned the global.configuration_poss to be used for printing
+ * 
+ */
+var configuration;
+
+exports.printTaxInvoice = function(taxInvoice){
+	console.log('Printing tax invoice in epsonprinter.js');
+	if(!configuration){
+		configuration = global.configuration_poss;
+	}
+	printDocumentTaxInvoice(taxInvoice, printInvoicePage);
+};
+
+exports.reprintTaxInvoice = function(taxInvoice){
+	console.log('Reprint tax invoice in epsonprinter.js');
+	if(!configuration){
+		configuration = global.configuration_poss;
+	}
+	printDocumentTaxInvoice(taxInvoice, printInvoicePage, true);
+};
+
+exports.printReturnNote = function(returnTxn){
+	console.log('Printing return note in epsonprinter.js');
+	if(!configuration){
+		configuration = global.configuration_poss;
+	}
+	printDoc(returnTxn, printReturnNotePage);
+};
+
+exports.printFile = function(destPrinter, file, nCopies) {
+	console.log('printFile in epsonprinter.js');
+    var spawn = require('child_process').spawn,
+    cmd = ['-d', destPrinter, '-o', 'media=a4'];
+    
+    if(nCopies && Number(nCopies) > 1) {
+    	cmd.push('-n');
+    	cmd.push(nCopies);
+    }
+	cmd.push('--');
+	cmd.push(file);
+	
+    lp = spawn('lp', cmd);
+
+    lp.stdout.on('data', function (data) {
+        console.log('print msg: ' + data);
+    });
+    lp.stderr.on('data', function (data) {
+    	console.log('print error: ' + data);
+	});
+    lp.on('close', function (code) {
+		console.log('print exit code: ' + code);
+		//require('fs').unlink(file);
+    });	    	
+};
+
+/**
+ * Requires phantom module to render PDF
+ * 
+ * @param data contains page attributes
+ * @param printPage function to render page
+ * @param reprint flag
+ */
+function printDocumentTaxInvoice(data, printPage, reprint){
+	data.MAX_ITEMS_PER_PAGE = 20;
+	data.totalPages = Math.floor(data.orderItems.length / data.MAX_ITEMS_PER_PAGE);
+	data.pageX = 1;
+	if(data.totalPages == 0 || data.orderItems.length % data.MAX_ITEMS_PER_PAGE > 0) {
+		data.totalPages += 1;
+	}
+	
+	//var phantom = require('phantom');
+	var phantom = require('phantom');
+	phantom.create(function(ph){
+		printPage(ph, data, reprint);
+	});
+};
+
+function printDoc(data, printPage, reprint){
+	data.MAX_ITEMS_PER_PAGE = 20;
+	data.totalPages = Math.floor(data.orderItems.length / data.MAX_ITEMS_PER_PAGE);
+	data.pageX = 1;
+	if(data.totalPages == 0 || data.orderItems.length % data.MAX_ITEMS_PER_PAGE > 0) {
+		data.totalPages += 1;
+	}
+	
+	var phantom = require('phantom');
+	phantom.create(function(ph){
+		printPage(ph, data, reprint);
+	});
+};
+
+function numberWithCommas(x) {
+	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function printInvoicePage(ph, taxInvoice, reprint) {
+	console.log('Printing ' + taxInvoice.pageX + ' of ' + taxInvoice.totalPages + '...');
+	ph.createPage(function(page) {
+		page.set('paperSize',{
+		  format: "Legal",
+		  orientation: "portrait",
+		  margin: {left:"0cm", right:"0cm", top:"0cm", bottom:"0cm"},
+		  header: {
+		  	height: "1cm",
+		  	contents: function(pageNum, numPages) {
+		  		return "<div>Page " + pageNum + " of " + numPages + "</div>";
+		  	}
+		  }
+		});
+
+		page.open("file://" + __dirname + "/tax-invoice.html", function(status) {
+			page.includeJs("file://" + __dirname + "/jquery-1.8.3.min.js", function(){
+				page.evaluate(function(taxInvoice, configuration, reprint){
+					function numberWithCommas(x) {
+						return (x ? Math.round(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","):"0");
+					}
+					function formatInvoiceDate(date) {
+						var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+						var d = new Date(date);
+						return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+					}
+					
+					function formatInvoiceTime(date) {
+						var d = new Date(date);
+						return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+					}
+
+					function getMarkupLabel(memberType) {
+						switch (memberType) {
+							case "EMPLOYEE":
+								return "Total Employee Mark Up";
+							default:
+								return "Total Non Member Mark Up";
+						}
+					}
+					
+					if (reprint) {
+						$('#hcWatermark').text('RE-PRINT');
+					}
+
+					$('#hcTaxInvNo').text(taxInvoice.invoiceNumber);
+					$('#hcDateIssued').text(formatInvoiceDate(taxInvoice.dateIssued));
+					$('#hcDatePurchased').text(formatInvoiceDate(taxInvoice.dateIssued));
+					$('#hcTimePurchased').text(formatInvoiceTime(taxInvoice.dateIssued));
+					$('#hcDateIssuedSignatory').text(formatInvoiceDate(taxInvoice.dateIssued));
+					$('#hcTxnNo').text(taxInvoice.transactionId);
+					$('#hcPageN').text(taxInvoice.pageX + '/' + taxInvoice.totalPages);
+					$('#hcPageTotal').text(taxInvoice.totalPages);
+					$('#hcSignatory').text(taxInvoice.signatoryFullName);
+					$('#hcSellerName').text(configuration.properties['HC_NAME']);
+					$('#hcSellerNpwp').text(configuration.properties['HC_TAX_ID']);
+					$('#hcSellerAddr').text(configuration.properties['HC_ADDRESS']);
+					$('#hcTelephoneNo').text(configuration.properties['HC_TELEPHONE_HOTLINE_NO']);
+					$('#hcBuyerId').text(taxInvoice.customerNumber);
+					$('#hcBuyerBizName').text(taxInvoice.taxName);
+					$('#hcBuyerTaxAddr').text(taxInvoice.taxAddress);
+					$('#hcBuyerNpwp').text(taxInvoice.taxId);
+					$('#hcCashierId').text(taxInvoice.cashierId);
+					$('#hcStoreLocation').text(configuration.properties['HC_CITY_LOCATION']);
+					$('#hclblBiayaNonMember').text(getMarkupLabel(taxInvoice.memberType));
+
+					var rows = '';						
+					var start = (taxInvoice.pageX - 1) * taxInvoice.MAX_ITEMS_PER_PAGE;
+					var end = Math.min(taxInvoice.pageX * taxInvoice.MAX_ITEMS_PER_PAGE, taxInvoice.groupedOrderItems.length);
+					var lastItemIndex = end  - 1;
+
+					for(var i=start; i < end; i++) {
+						var item = taxInvoice.groupedOrderItems[i];
+						rows += "<tr style='vertical-align: top;'><td  class='item-list-no-value' align='center'>" + (i+1) + 
+				            "</td><td class='item-list-nama-value'> " 
+				            	+ item.ean13Code.toString() + " "
+				            	+ (item.description ? item.description : item.shortDesc) + (item.isTaxInclusive ? " <span class='asterisk'>&#10033</span>" : "") +
+				            "</td><td  class='item-list-jumlah-value' align='center'>" + item.quantity + 
+				            "</td><td  class='item-list-saluan-value' align='right'>" + numberWithCommas(item.sellingPriceBeforeTax / item.quantity) + 
+				            "</td><td class='item-list-jual-value' align='right'>" + numberWithCommas(item.sellingPriceBeforeTax) + "</td></tr>";							
+							if(i == lastItemIndex){
+								var rowFillerNo = end % taxInvoice.MAX_ITEMS_PER_PAGE == 0 ? 
+										1 : (taxInvoice.MAX_ITEMS_PER_PAGE - (end % taxInvoice.MAX_ITEMS_PER_PAGE));
+								if(taxInvoice.pageX == taxInvoice.totalPages){
+									$('#calculationSummaryFiller').hide();
+									for(var x=0;x < rowFillerNo;x++){
+										rows += "<tr><td class='item-list-no-value' align='center'>&nbsp;"+
+							            "</td><td class='item-list-nama-value'>&nbsp;"+ 
+							            "</td><td class='item-list-jumlah-value' align='center'>&nbsp;"+  
+							            "</td><td class='item-list-saluan-value' align='right'>&nbsp;"+  
+							            "</td><td class='item-list-jual-value' align='right'>&nbsp;</td></tr>";
+									}
+								}else{
+									//flag to show row of summary calculations filler
+									$('#calculationSummaryFiller').show();
+								}
+							}
+					}
+					
+		            $("#hcLineItemHeaderRow").after(rows);
+		            if(taxInvoice.pageX == taxInvoice.totalPages) {
+						// Harga Jual Penggantian Qty
+		            	$('#hcTotalQty').text(numberWithCommas(taxInvoice.totalQuantity));
+						// Total Biaya Non Member
+		            	$('#hcTotalNonMemberMarkup').text(numberWithCommas(taxInvoice.totalNonMemberMarkupTaxable));
+						// Harga Jual / Penggantian
+		            	$('#hcTotalAmtNoTax').text(numberWithCommas(Math.ceil(taxInvoice.totalSellingPriceBeforeTax)));
+						// ???
+		            	$('#hcTotalAmtBeforeTax').text(numberWithCommas(Math.ceil(taxInvoice.totalSellingPriceBeforeTax)));
+		            	// PPN
+		            	$('#hcTotalVat').text(numberWithCommas(Math.floor(taxInvoice.totalTax)));
+						// Total Yang Harus Dibayar
+		            	$('#hcTotalAmtTaxed').text(numberWithCommas(taxInvoice.totalSellingPriceBeforeTax + taxInvoice.totalTax));
+						// Total media payment
+		            	$('#hcTotalAmountPaid').text(numberWithCommas(taxInvoice.totalAmountPaid));
+						// Kembalian
+		            	$('#hcTotalChange').text(numberWithCommas(taxInvoice.totalChange));
+		            
+						/**Display summation values */
+		            	
+		            	// Barang & Jasa Kena Pajak* Price Taxable
+						$('#sumSellingPriceTaxable').text(numberWithCommas(Math.ceil(taxInvoice.totalSellingPriceTaxable + taxInvoice.totalNonMemberMarkupTaxable)));
+						// Barang & Jasa Kena Pajak* PPN
+						$('#sumPPN').text(numberWithCommas(Math.floor(taxInvoice.totalTax)));
+						// Barang & Jasa Kena Pajak* Total Harga
+						$('#sumSellingPricePlusTax').text(numberWithCommas(taxInvoice.totalSellingPriceTaxable + taxInvoice.totalTax + taxInvoice.totalNonMemberMarkupTaxable));
+						
+						// Bukan Barang Kena Pajak & Jesa Kena Paja* non taxable 1 
+						$('#sumSellingPriceNonTaxable1').text(numberWithCommas(taxInvoice.totalSellingPriceNonTaxable));
+						// BUKAS BARANG KENA PAJAK non taxable 2 
+						$('#sumSellingPriceNonTaxable2').text(numberWithCommas(taxInvoice.totalSellingPriceNonTaxable));
+						
+						// GRAND TOTAL grand Harga
+						$('#grandHarga').text(numberWithCommas(taxInvoice.totalSellingPriceTaxable + taxInvoice.totalSellingPriceNonTaxable + taxInvoice.totalNonMemberMarkupTaxable));
+						// GRAND TOTAL grand PPN
+						$('#grandPPN').text(numberWithCommas(Math.floor(taxInvoice.totalTax)));
+						// GRAND TOTAL grand Total Harga
+						$('#grandTotalHarga').text(numberWithCommas(taxInvoice.totalSellingPriceTaxable + taxInvoice.totalSellingPriceNonTaxable + taxInvoice.totalTax + taxInvoice.totalNonMemberMarkupTaxable));
+						
+		            } else{
+		            	//Hide the Summary Details Section
+		            	$('#hcBiayaNonMember').hide();
+		            	$('#hcHargaJual').hide();
+		            	$('#hcPpn').hide();
+		            	$('#hcTotalYangHarusDibayar').hide();
+		            	$('#hcTotalMediaPayment').hide();
+		            	$('#hcKembalian').hide();
+		            	$('#hcSummaryBreakDown').hide();
+		            }
+					//$('tr').hide();
+					return taxInvoice.pageX;
+				}, function(result) {
+					var outFile = taxInvoice.invoiceNumber + '_' + result + '.pdf';
+					page.render(outFile, function(){
+						printFile(configuration.properties['HC_PRINTER_QUEUE_NAME'], outFile, 
+								configuration.properties['HC_INV_N_COPIES']);
+						if(result == taxInvoice.totalPages) {
+							ph.exit();
+						} else {
+							taxInvoice.pageX = result + 1;
+							printInvoicePage(ph, taxInvoice, reprint);
+						}
+					});
+				}, taxInvoice, configuration, reprint);
+			});
+		});
+	});
+}
+
+function printReturnNotePage(ph, returnNote) {
+	console.log('Printing ' + returnNote.pageX + ' of ' + returnNote.totalPages + '...');
+	ph.createPage(function(page) {
+		page.set('paperSize',{
+				  format: "Legal",
+				  orientation: "portrait",
+				  margin: {left:"0cm", right:"0cm", top:"0cm", bottom:"0cm"},
+				});
+		page.open("file://" + __dirname + "/return-note.html", function(status) {
+			page.includeJs("file://" + __dirname + "/jquery-1.8.3.min.js", function(){
+				page.evaluate(function(returnNote, configuration){
+					function numberWithCommas(x) {
+						return (x ? Math.round(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","):"0");
+					}
+
+					function formatReturnDate(date) {
+						var d = date ? new Date(date) : new Date();
+						return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
+					}
+
+					function formatPurchaseDate(date) {
+						var d = new Date(date);
+						return d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
+					}
+
+					function getMarkupLabel(memberType) {
+						switch (memberType) {
+							case "EMPLOYEE":
+								return "Total Employee Mark Up";
+							default:
+								return "Total Non Member Mark Up";
+						}
+					}
+
+					$('#hcStoreCode').text(configuration.storeCode);
+					$('#hcStoreName').text(configuration.storeName);
+					$('#hcReturnNoteNo').text(returnNote.returnNoteNumber);
+					$('#hcTxnDate').text(formatPurchaseDate(returnNote.purchaseDate));
+					$('#hcTaxInvNo').text(returnNote.taxInvoiceNumber);
+					$('#hcTxId').text(returnNote.transactionId);
+					$('#hcPageN').text(returnNote.pageX + '/' +returnNote.totalPages);
+					$('#hcPageTotal').text(returnNote.totalPages);
+					$('#hcSellerName').text(configuration.properties['HC_NAME']);
+					$('#hcSellerNpwp').text(configuration.properties['HC_TAX_ID']);
+					$('#hcSellerAddr').text(configuration.properties['HC_ADDRESS']);
+					$('#hcBuyerBizName').text(returnNote.businessName);
+					$('#hcBuyerTaxAddr').text(returnNote.taxAddress);
+					$('#hcBuyerNpwp').text(returnNote.taxId);
+					$('#hcStoreLocation').text(configuration.properties['HC_CITY_LOCATION']);
+					$('#hcReturnDate').text(formatReturnDate(returnNote.returnDate));
+					$('#hcCustomerName').text(returnNote.customerName);					
+					$('#hcBuyerName').text(returnNote.customerName);
+					$('#hcSellerTelepon').text(configuration.properties['HC_TELEPHONE_HOTLINE_NO']);
+					$('#hclblBiayaNonMember').text(getMarkupLabel(returnNote.memberType));
+					
+					var rows = '';
+					var start = (returnNote.pageX - 1) * returnNote.MAX_ITEMS_PER_PAGE;
+					var end = Math.min(returnNote.pageX * returnNote.MAX_ITEMS_PER_PAGE, returnNote.orderItems.length);
+					for (var i=start; i<end; i++) {
+						var item = returnNote.orderItems[i];
+			            rows += "<tr><td class='itemNo'>" + (i+1) + 
+			            "</td><td>"
+			            	+ item.ean13Code.toString() + " "
+			            	+ (item.description ? item.description : item.shortDesc) + (item.isTaxInclusive ? " <span class='asterisk'>&#10033</span>" : "") +
+			            "</td><td class='itemQty'>" + item.quantity + 
+			            "</td><td class='itemPrice'>" + numberWithCommas(Math.round(item.sellingPriceBeforeTax / item.quantity)) +
+			            "</td><td class='itemSellingPrice'>" + numberWithCommas(item.sellingPriceBeforeTax) + "</td></tr>";
+					}
+
+		            $("#hcTotalsSummary").before(rows);
+		            $("#nonMemberMarkup").text(numberWithCommas(returnNote.totalNonMemberMarkup));
+
+		            if (returnNote.pageX == returnNote.totalPages) {
+						//$('#hcTotalVat').text(numberWithCommas(Math.round(returnNote.vat)));
+						//$('#hcTotalAmtTaxed').text(numberWithCommas(Math.round(returnNote.totalSellingPriceBeforeTax + returnNote.vat)));
+						//$('#hcTotalAmtTaxed').text(numberWithCommas(Math.round(returnNote.totalAmount)));
+<<<<<<< HEAD
+
+						/*
+						 * First summary table
+						 */
+
+						// Jumlah Harga Jual BKP yang dikembalikan
+						$("#hcTotalSellingPrice").text(numberWithCommas(returnNote.totalSellingPriceBeforeTax));
+
+						// Potongan Harga BKP yang dikembalikan (NOTE: Formula not yet final)
+						$("#hcDiscount").text("-");
+
+						// Total Harga Jual BKP setelah Potongan Harga yang dikembalikan
+						$("#hcSubTotal").text(numberWithCommas(returnNote.totalSellingPriceBeforeTax));
+
+						// PPN yang diminta kembali
+						$('#hcTotalVat').text(numberWithCommas(Math.floor(returnNote.totalTax)));
+
+						// Total yang harus dikembalikan
+						$("#hcTotalAmt").text(numberWithCommas(Math.ceil(returnNote.totalSellingPriceBeforeTax + returnNote.totalTax)));
+
+						// PPnBM yang diminta kembali (NOTE: Formula not yet final)
+						$("#hcPpnBm").text("-");
+
+						/*
+=======
+
+						/*
+						 * First summary table
+						 */
+
+						// Jumlah Harga Jual BKP yang dikembalikan
+						$("#hcTotalSellingPrice").text(numberWithCommas(returnNote.totalSellingPriceBeforeTax));
+
+						// Potongan Harga BKP yang dikembalikan (NOTE: Formula not yet final)
+						$("#hcDiscount").text("-");
+
+						// Total Harga Jual BKP setelah Potongan Harga yang dikembalikan
+						$("#hcSubTotal").text(numberWithCommas(returnNote.totalSellingPriceBeforeTax));
+
+						// PPN yang diminta kembali
+						$('#hcTotalVat').text(numberWithCommas(Math.floor(returnNote.totalTax)));
+
+						// Total yang harus dikembalikan
+						$("#hcTotalAmt").text(numberWithCommas(Math.ceil(returnNote.totalSellingPriceBeforeTax + returnNote.totalTax)));
+
+						// PPnBM yang diminta kembali (NOTE: Formula not yet final)
+						$("#hcPpnBm").text("-");
+
+						/*
+>>>>>>> c1b191f85d13c0d87c2ecd6a563773ee6f0f9753
+						 * Second summary table
+						 */
+
+						// Barang & Jasa Kena Pajak*, HARGA
+						$('#sumSellingPriceTaxable').text(numberWithCommas(returnNote.totalSellingPriceTaxable + returnNote.totalNonMemberMarkup));
+
+						// Barang & Jasa Kena Pajak*, PPN
+						$('#sumPPN').text(numberWithCommas(Math.floor(returnNote.totalTax)));
+
+						// Barang & Jasa Kena Pajak*, TOTAL HARGA
+						$('#sumSellingPricePlusTax').text(numberWithCommas(returnNote.totalSellingPriceTaxable + returnNote.totalTax + returnNote.totalNonMemberMarkup));
+
+						// Bukan barang kena pajak, HARGA
+						$('#sumSellingPriceNonTaxable1').text(numberWithCommas(returnNote.totalSellingPriceNonTaxable));
+
+						// Bukan barang kena pajak, PPN - blank
+
+						// Bukan barang kena pajak, TOTAL HARGA
+						$('#sumSellingPriceNonTaxable2').text(numberWithCommas(returnNote.totalSellingPriceNonTaxable));						
+		            }
+
+					/*for(var i=start; i<end; i++) {
+						var item = returnNote.orderItems[i];
+			            rows += "<tr style='vertical-align: top;'><td align='center'>" + (i+1) + 
+			            "</td><td>" + (item.description ? item.description : item.shortDesc) + (item.isTaxInclusive ? " <span class='asterisk'>&#10033</span>" : "") +
+			            "</td><td align='center'>" + item.quantity + 
+			            "</td><td align='right'>" + numberWithCommas(Math.round(item.priceUnit)) +
+			            "</td><td align='right'>" + numberWithCommas(Math.round(item.sellingPriceBeforeTax)) + "</td></tr>";
+					}
+		            $("#hcTotalsSummary").before(rows);
+		            
+		            if(returnNote.pageX == returnNote.totalPages) {
+						$('#hcTotalNonMemberMarkup').text(numberWithCommas(Math.round(returnNote.totalNonMemberMarkupTaxable)));
+						$('#hcTotalAmtNoTax').text(numberWithCommas(Math.ceil(returnNote.totalSellingPriceBeforeTax)));
+						$('#hcTotalVat').text(numberWithCommas(Math.floor(returnNote.vat)));
+						$('#hcTotalAmtTaxed').text(numberWithCommas(Math.ceil(returnNote.totalSellingPriceBeforeTax) + 
+								Math.floor(returnNote.vat)));
+		            }*/
+
+					return returnNote.pageX;
+				}, function(result) {
+					var outFile = returnNote.returnNoteNumber + '_' + result + '.pdf';
+					page.render(outFile, function(){
+						printFile(configuration.properties['HC_PRINTER_QUEUE_NAME'], outFile, 
+							configuration.properties['HC_INV_N_COPIES']);
+						if(result == returnNote.totalPages) {
+							ph.exit();
+						} else {
+							returnNote.pageX = result + 1;
+							printReturnNotePage(ph, returnNote);
+						}
+					});
+				}, returnNote, configuration);
+			});
+		});
+	});
+}
+

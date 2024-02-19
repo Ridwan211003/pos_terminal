@@ -1,0 +1,208 @@
+@charset "UTF-8";
+/* CSS Document */
+/* for head cashier page specifics */
+
+form.noBg {
+    background: none;
+    border: none;
+    margin-top: -20px;
+    border-radius: 10px;
+    padding: 0;
+}
+
+form#timeInForm, form#timeOutForm {
+    display: inline;
+}
+
+form#updateTerminalCountForm {
+    width: 500px;
+}
+
+button#addCashierLeave, button#addCashierDayOff {
+    width: 95px;
+}
+
+button#deleteCashierLeave, button#deleteCashierDayOff {
+    width: 60px;
+}
+
+button#updateTimeIn, button#updateTimeOut {
+    width: 60px;
+}
+
+button#updateTerminalCount {
+    width: 60px;
+}
+
+.datepickerForUserLeaves {
+    width: 190px;
+}
+
+.datepickerForDayOffStart {
+    width: 190px;
+}
+
+.datepickerForDayOffEnd {
+    width: 190px;
+}
+
+.datepickerForViewGraph {
+    width: 190px;
+}
+
+.timepickerForShiftSchedule {
+    width: 90px;
+}
+
+.datetimepickerForAddTerminal {
+    width: 190px;
+}
+
+.datepickerForGenerateSched {
+    width: 190px;
+}
+
+input#terminalCount {
+    width: 50px;
+}
+
+.alwaystop {
+    vertical-align: top;
+}
+
+.terminalGraph {
+    width: 980px;
+    height: 400px;
+}
+
+.cashierDayOff td {
+    padding-right: 20px;
+}
+
+/*div.configGroup {
+    border: 1px inset !important;
+}*/
+
+input.timeFormat {
+    width: 2em;
+    padding: 0 5px 0 5px;
+}
+
+input.hour {
+    text-align: right;
+}
+
+#ui-datepicker-div {
+	z-index: 101 !important;
+}
+
+.table-container {
+    strong textwidth:1020px;
+    height:40px;
+    display:table;
+    width:100%;
+}
+.table-container div {
+    height:40px;
+    display:table-cell;
+}
+.table-content {
+    width:142px;
+    max-width:142px;
+}
+
+.text-label {
+	font-style: italic !important;
+	font: xx-small lighter;
+	padding: 0;
+	color: gray;
+}
+
+.text-display {
+    font-style: normal !important;
+    font: xx-small lighter;
+    padding: 0;
+    color: black;
+}
+
+div.section {
+	border: 1px;
+	border-style: inset;
+	padding: 8px;
+}
+
+div.data-display {
+	overflow: auto !important;
+	height: 500px;
+	max-height: 500px;
+	width: 100%;
+}
+
+li.chron-day-tab {
+	border: 1px dotted lightgray;
+	border-bottom: none;
+    border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	display: inline-block;
+	width: 70px;
+	height: 25px;
+	text-align: center;
+    text-transform: uppercase;
+	vertical-align: middle;
+	padding-top: 5px;
+	margin: 0px;
+}
+
+li.chron-day-selected {
+	border-style: inset !important;
+}
+
+span.chron-date {
+    color: graytext;
+    font-size: x-small;
+    font-weight: lighter;
+}
+
+span.chron-date-selected {
+    color: black;
+}
+
+span.day-tab {
+    color: graytext;
+    font-size: x-small;
+    font-weight: lighter;
+    background-color: white !important;
+}
+
+span.day-selected {
+	color: #005CA6;
+	font-size: medium;
+	font-weight: bold;
+    background-color: white !important;
+}
+
+table.table-scheds {
+	font-size: 8px !important;
+	font-weight: lighter;
+}
+
+.toggle-sched-tab {
+    border: 1px dotted lightgray;
+    border-bottom: none;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    display: inline-block;
+    width: 100px;
+    height: 15px;
+    text-align: center;
+    text-transform: uppercase;
+    vertical-align: middle;
+    padding-top: 5px;
+    margin: 0px;
+}
+
+.toggle-sched-selected {
+    border-style: outset !important;
+}

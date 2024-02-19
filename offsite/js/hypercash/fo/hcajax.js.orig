@@ -1,0 +1,116 @@
+var Hypercash = Hypercash || {};
+
+Hypercash.url = {
+	taxInvoiceNumber:	posWebContextPath + '/hypercash/hypercashsequence/taxInvoiceNumber/',
+	taxInvoiceToday: posWebContextPath + '/hypercash/taxinvoice/find/terminalId/today/',
+	printTaxInvoice: posWebContextPath + '/cashier/printTaxInvoice/',
+<<<<<<< HEAD
+  taxInvoiceValidToReprint: posWebContextPath + "/hypercash/taxinvoice/reprint/findByTxnId/",
+  printReturnNote: proxyUrl + "/printReturnNote"
+=======
+	taxInvoiceValidToReprint: posWebContextPath + "/hypercash/taxinvoice/reprint/findByTxnId/",
+	printReturnNote: proxyUrl + "/printReturnNote"
+>>>>>>> c1b191f85d13c0d87c2ecd6a563773ee6f0f9753
+};
+
+Hypercash.ajax = {
+	request : function(options) {
+		var response;
+		$.ajax({
+			url: options.url,
+			type: options.type == undefined? 'GET' : options.type,
+			cache: false,
+			dataType: options.dataType == undefined ? 'json' : options.dataType,
+			data: options.data,
+			contentType: options.contentType == undefined ? 'application/json' : options.contentType,
+            async: options.async == false ? false : true,
+            success: function (data) {
+                response = data;
+                if (options.success) options.success(data);
+            },
+			error: function (xhr, status, error) {
+				console.log(xhr);
+				console.log(status);
+				console.log(error);
+				if (options.error) options.error({errorCode : xhr.status , status : status, error: error});
+			},
+            complete: function () {
+                if (options.complete) options.complete();
+            }
+		});
+	},
+	getTaxInvoice : function(statusCode, transactionCode, callback, errorCallback){
+  	this.request({
+  		url : Hypercash.url.taxInvoiceNumber + statusCode + '/' + transactionCode,
+  		async : false,
+  		success : function(data){
+  			if(callback) callback(data);
+  		},
+  		error : function(data){
+  			if(errorCallback) errorCallback(data);
+  		}
+  	});
+  },
+  getTaxInvoiceToday : function(container, callback, errorCallback){
+  	this.request({
+  		url : Hypercash.url.taxInvoiceToday + configuration.terminalId,
+  	    async : false,
+  	    success : function(data){
+  	    	if(callback) callback(container, data);
+  	    },
+  	    error: function(data){
+  	    	if(errorCallback) errorCallback(data);
+  	    }
+  	});
+  },
+  printTaxInvoice : function(transactionNumber, callback, errorCallback){
+     	this.request({
+     		url : Hypercash.url.printTaxInvoice + transactionNumber,
+     		async : false,
+     		success : function(data) {
+     			if(callback) callback(data);
+     		},
+     		error: function(data) {
+     			if(errorCallback) errorCallback(data);
+     		}
+     	});
+  },
+
+  /*
+   * Finds tax invoice with the specified transaction id
+   * @return TaxInvoiceDTO
+   */
+  findTaxInvoiceByTxnId : function(txnId, callback, errorCallback) {
+    this.request({
+      url: Hypercash.url.taxInvoiceValidToReprint + txnId,
+      type: "GET",
+      async: false,
+      success: function(data) {
+        if (callback) callback(data);
+      },
+      error: function(data) {
+        if (errorCallback) errorCallback(data);
+      }
+    });
+  },
+
+  printReturnNote: function(requestData, callback, errorCallback) {
+    this.request({
+      url: Hypercash.url.printReturnNote,
+      type: "POST",
+      async: false,
+<<<<<<< HEAD
+      dataType: "json",
+      contentType: 'application/json',
+=======
+>>>>>>> c1b191f85d13c0d87c2ecd6a563773ee6f0f9753
+      data: requestData,
+      success: function(data) {
+        if (callback) callback(data);
+      },
+      error: function(data) {
+        if (errorCallback) errorCallback(data);
+      }
+    });
+  }
+};

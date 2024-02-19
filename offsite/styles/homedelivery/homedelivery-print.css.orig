@@ -1,0 +1,264 @@
+@page { 
+	size: 8.5in 11in; 
+<<<<<<< HEAD
+	margin: 0.3cm; 
+=======
+	margin: 0.3cm;
+}
+
+.clear {
+	clear: both;
+>>>>>>> 1.7
+}
+
+.deliveryNote {
+	font-family:  'Arial';
+<<<<<<< HEAD
+	font-size : 14px;
+=======
+	font-size : 12px;
+>>>>>>> 1.7
+	clear: both;
+}
+
+.deliveryNote h3 {
+	font-family:  'Courier';
+	text-align: center;
+	font-size: 20px;
+	padding : 30px;
+}
+
+.deliveryNote .dnHeader {
+	padding : 0px;
+}
+
+.deliveryNote .deliveryNoteHeaderTitle {
+	font-size: 24px;
+}
+
+.deliveryNote .deliveryNoteTitleContainer {
+	text-align: center;
+}
+
+.deliveryNote .deliveryNoteFooterContainer {
+	text-align: center;
+}
+
+.delvieryNote .label_delivery_date {
+	width: 150px;
+}
+
+.delNoteLabel {
+	text-align: right; 
+	padding: 3px 10px;
+	width: 200px;
+}
+
+.deliveryNote .fieldValue {
+	padding-left : 0px;
+}
+
+.deliveryNote .delNoteAddressTable {
+	width: 50%;
+	font-family : 'Courier';
+	float : left;
+}
+
+.deliveryNote .deliveryItems {
+  padding-left: 10px;
+  padding-right: 50px;
+  width: 100%;
+}
+
+.deliveryNote .deliveryItems tr{
+	text-align : center;
+}
+
+.deliveryNote .footer {
+	width : 100%;
+	position: relative;
+	bottom: 0;
+}
+
+.deliveryNote table.deliveryNoteReceiptTotalContainer {
+	width: 100%;
+	padding : 20px;
+}
+
+.deliveryNote .deliveryNoteReceiptTotalContainer .deliveryNoteReceiptLabel {
+	width: 200px;
+}
+
+.deliveryNote .deliveryNoteReceiptTotalContainer .deliveryNoteReceiptLabel2 {
+	padding-left: 30px;
+}
+
+.deliveryNote .deliveryNoteSectionContainer {
+	padding-top: 10px;
+	width :96%; 
+}
+
+.deliveryNote .deliveryNoteAddressTable {
+	width : 100%;
+}
+
+.deliveryNote .deliveryNoteTaxTable {
+	width : 100%;
+}
+
+.deliveryNote .deliveryNoteReceiptThankYouMessageContainer {
+	text-align: center;
+	padding: 10px;
+}
+
+.deliveryNote .deliveryOrderPaymentReceiptContainer {
+	float: right; 
+	width : 43%; 
+	border: 1px solid gray;
+}
+
+.deliveryNote .deliveryNoteReceiptTitle {
+	text-align: center; 
+	text-decoration:underline; 
+	font-weight:bold; 
+	font-size : 20px;
+	padding-top: 10px;
+}
+
+.deliveryNote table.deliveryOrderInfoTable {
+	float: left; 
+	width : 55%;
+}
+
+.deliveryNote .deliveryNotePrintType {
+	font-size: 18px;
+}
+
+.PrintArea {
+    margin: 20px 5px;
+    padding: 10px;
+    width: 400px;
+}
+.button {
+    background: none repeat scroll 0 0 #999999;
+    border: 1px solid blue;
+    color: #EEEEEE;
+    cursor: pointer;
+    padding: 3px 5px;
+    text-align: center;
+    width: 80px;
+}
+span.test {
+    color: red;
+}
+
+#Retain.PrintArea.area1 {
+    border: 1px solid #999;
+}
+
+.PrintArea.area1 {
+    border: solid 1px #ffb40f;
+}
+
+.PrintArea.area2 {
+    border: solid 1px #20ff58;
+}
+
+<<<<<<< HEAD
+.delNotetTitle {
+	text-align: right; 
+	padding: 5px 20px;
+	width: 65%;
+}
+
+=======
+>>>>>>> 1.7
+.hdcreate{
+	text-align:right;
+	padding: 10px 0px 20px 0px;
+	font-weight: bolder;
+}
+
+.hdmainTitle {
+  	font-weight: bolder;
+  	line-height: 5px;
+  	margin-top: 0;
+ 	padding-right: 15px;
+  	font-size: 15px;
+}
+
+.dnsubheader{
+	font-weight: bolder;
+	text-align: left;
+	font-size: 15px;
+<<<<<<< HEAD
+=======
+}
+
+.hdOperationDeliveryReport{
+	margin: 10px 5px 10px 5px;
+}
+
+.hdOperationDeliveryReport .odReportHeaderContainer .odrHeader {
+	padding : 0px;
+	font-size: 18px;
+	font-family : 'Courier';
+	margin-top: 5px;
+	margin-bottom: 3px;
+	text-align: center;
+	font-weight: bold;
+}
+
+.odrSubHeaderTbl{
+	margin-top: 0px;
+}
+
+.odrSubHeaderTbl .odrSubHeaderTd{
+	font-size: 13px;
+	font-family: 'Arial';
+	font-weight: bold;
+}
+
+.odrSubHeaderTbl .odrSubHeaderTdVal{
+	font-weight: bold;
+	font-size: 13px;
+	font-family: 'Arial';
+}
+
+.odReportCommonFont{
+	font-weight: bold;
+	font-size: 12px;
+	font-family: 'Courier';
+}
+
+.odReportRecordsContainer{
+	margin-top: 6px;
+}
+
+.odReportRecordsContainer table{
+	border-spacing: 0;
+}
+
+.odReportRecordsContainer table thead tr th{
+	font-weight: bold;
+	font-family: 'Courier';
+	border-top: 2px solid black;
+	border-bottom: 2px solid black;
+	font-size: 10px;
+}
+
+.odReportRecordsContainer table tbody tr td{
+	font-weight: bold;
+	font-family: 'Courier';
+	border-bottom: 1px solid black;
+	font-size: 11px;
+}
+
+.odReportsChargeTotalContainer {
+	font-weight: bold;
+}
+
+.odrStoreContainerTbl {
+	font-weight: bold;
+>>>>>>> 1.7
+}

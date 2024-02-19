@@ -1,0 +1,797 @@
+//Nodejs Libraries
+var escpos = require('.././escpos/node-escpos.js');
+var EscPosPrinter = escpos.EscPosPrinter;
+var environment = process.argv;
+var config = require(".././config/config.js");
+
+//Drawer Codes
+const DRAWER_OPEN_STATUS = 0;
+const DRAWER_CLOSE_STATUS = 1;
+const DRAWER_CONNECTION_OFFSET = 3;
+const DRAWER_OFF_LINE = 1;
+const DRAWER_ON_LINE = 0;
+const DRAWER_STATUS_OFFSET = 2;
+const DRAWER_1_OPEN_CMD = "\x1b\x70\x00\x05\x05";
+const DRAWER_2_OPEN_CMD = "\x1b\x70\x01\x05\x05";
+const DRAWER_STATUS_CMD = "\x10\x04\x01";
+const PRINTER_RESPONSE_TIME = 300; //timeout in ms
+const PAPER_FULL_CUT='\x1b\x69';
+const PAPER_PART_CUT='\x1b\x6d';
+const INIT_PRINT = "\x1b\x40";
+
+//Messages
+const PRINT_MSG = "Printing receipt.";
+const PRINT_MSG_SUC = "Receipt printed.";
+const PRINT_MSG_ERR = "Unable to print receipt.";
+const DRAWER_MSG_OPEN = "Opening cash drawer.";
+
+const DRAWER_OPEN = "Drawer is open.";
+const DRAWER_CLOSE = "Drawer is close.";
+const DRAWER_ERROR = "Unable to check drawer status.";
+
+const receiptLabel = "";
+
+// initialize config file
+config = config.getConnection();
+// initialize port path
+console.log("printer:" + config.device.printer);
+var devPort = config.device.printer;
+var printer = new EscPosPrinter(devPort);
+var printerReceipt = require('./printer-receipt.js');
+var printerReport = require('./printer-report.js');
+
+var printTestCounter = 0;
+
+/*
+ * Log if printer is connected.
+ */
+printer.on("ready", function() {
+	console.log('Printer is ready.');
+});
+
+
+/*
+ * Calls function to print receipt.
+ */
+exports.print_receipt = function(req, res) {
+	//console.log('Printing Receipt.');
+	var printStatus = "";
+	req.on('data', function(data) {
+		// console.log('data received:' + data);
+		// print order
+		printTestCounter = 0;
+		printStatus = printReceipt(JSON.parse(data));
+		printTest(JSON.parse(data));
+	});
+	res.send(printStatus);
+};
+
+/*
+ * Calls function to print document.
+ */
+exports.print_document = function(req, res) {
+	console.log('Printing Document.');
+	var printStatus = "";
+	req.on('data', function(data) {
+		printStatus = printDocument(JSON.parse(data));
+		printDocumentTest(JSON.parse(data));
+	});
+	res.send(printStatus);
+};
+
+exports.print_report = function(type, reportToPrint, res){
+<<<<<<< HEAD
+	printerReport.printReport(reportToPrint,  type, res, printer);
+	printerReport.printReportTest(reportToPrint);
+};
+
+
+=======
+	switch(type){
+		case 'OFFLINE_TRANSACTIONS':
+			printReport(reportToPrint,  type, res);
+			printReportTest(reportToPrint);
+	}
+};
+
+/**
+*	Function used to print reports of different type
+*
+*	@param reportToPrint contains data to be printed
+*	@param type indicates the report type. Used to pick body printer for different type of reports
+*	@param res response object to be used when sending back printer operation status
+*/
+
+function printReport(reportToPrint, type, res){
+	try {
+		if(reportToPrint.header){
+			printReportHeader(reportToPrint.header);
+		}
+			
+		if(reportToPrint.body){
+			if(type === 'OFFLINE_TRANSACTIONS')
+				printOfflineTransactionsReportBody(type, reportToPrint.body)
+		}
+		// No footer implementation yet. Add if needed
+		if(reportToPrint.footer){
+			printReportFooter(reportToPrint.footer);	
+		}
+		cutPrinterBottom();
+		res.writeHead('200', 'OK', { 'Content-Type': 'application/json;charset=UTF-8' });
+		res.end(null);
+	} catch (err) {
+		console.log(err.message);
+		console.log("Unable to print receipt");
+		res.writeHead('500', 'PRINT_REPORT_ERROR', { 'Content-Type': 'application/json;charset=UTF-8' });
+		res.end(JSON.stringify({ status: 'Error encountered while printing report\n' + err.message}));
+	}
+}
+
+/**
+*	Generic function used to print report header
+*	@param headerArray contains strings to be printed at separate lines each
+*/
+function printReportHeader(headerArray){
+	// Prints header containing date, pos terminal number, store code, etc.
+	headerArray.forEach(function(data){
+		printer.printCentered(data);
+	});
+}
+
+
+/**
+*	Generic function used to print report footer
+*	@param footerArray	array of Strings to be printed in footer section
+*/
+function printReportFooter(footerArray){
+	// Prints footer
+	footerArray.forEach(function(data){
+		printer.printCentered(data);
+	});
+}
+
+function printOfflineTransactionsReportBody(type, offlineTxns){
+	// Get each key of offlineTxns data
+	// Each key corresponds to one transaction type (e.g., SALE, VOID, RETURN, etc.)
+	Object.keys(offlineTxns).forEach(function(key){
+		// Print key as label
+		printer.printLine(key);
+		// For each data under the same key, print transactionId, transactionDate and totalPayment
+		offlineTxns[key].forEach(function(data){
+			printer.printLine(data.transactionId + '  ' + data.transactionDate + '  ' + data.totalPayment);
+			if(data.baseTransactionId){
+				printer.printCentered('Base Transaction: ' + data.baseTransactionId);
+			}
+		});
+		printer.printCentered('\n');	
+	});
+}
+
+function cutPrinterBottom() {
+	printer.printCentered('\n');
+	printer.printCentered('\n');
+	printer.printCentered('\n');
+	printer.printCentered('\n');
+	printer.printCentered('\n');
+	printer.printCommand(PAPER_FULL_CUT);
+}
+
+function printReportTest(){
+	console.log('TODO: implement logging here for historical data');
+}
+>>>>>>> 1.4-snapshot
+/*exports.open_drawer_no_status_check = function(req, res) {
+	console.log('Opening Drawer.');
+	printer.printCommand(DRAWER_1_OPEN_CMD);
+	res.send("Opening cash drawer...");
+};*/
+
+/*exports.open_drawer = function(req, res) {
+	var isDrawerClose = true;
+	var isOnline = false;
+
+	console.log('Opening Drawer.');
+	// open drawer
+	printer.printCommand(DRAWER_1_OPEN_CMD);
+	// escpos command to check printer status
+	console.log('Check Drawer Status.');
+	printer.checkStatus(DRAWER_STATUS_CMD);
+
+	// return status from printer
+	printer.once('readStatus', function(data) {
+		var buffer = new Buffer(data);
+		console.log(data);
+		// read raw data as int value
+		buffer = buffer.readUInt8(0);
+		// convert raw data to binary
+		var binaryCode = decimalToBinary(buffer);
+		// log returned data of printer
+		console.log("Printer Status:" +binaryCode);
+		//offset 3 determines if printer/drawer is online
+		if (binaryCode[DRAWER_CONNECTION_OFFSET] == DRAWER_ON_LINE) {
+			isOnline = true;
+			if (binaryCode[DRAWER_STATUS_OFFSET] == DRAWER_OPEN_STATUS) {
+				isDrawerClose = false;
+				console.log(DRAWER_OPEN);
+			} else if(binaryCode[DRAWER_STATUS_OFFSET] == DRAWER_CLOSE_STATUS) {
+				isDrawerClose = true;
+				console.log(DRAWER_CLOSE);
+			}
+		}
+	});
+
+	// set timeout to wait for printer response;
+	setTimeout(function(){
+		console.log("isOnline: "+ isOnline);
+		console.log("isDrawerClose: "+ isDrawerClose);
+		if(isOnline){
+			sendResponse(res, 200, 'OK', 'application/json;charset=UTF-8'
+					, JSON.stringify({isClose : isDrawerClose}));
+		} else {
+			sendResponse(res, 400, 'Bad Request', 'application/json;charset=UTF-8'
+					, JSON.stringify({msg:DRAWER_ERROR}));
+		}
+	},200);
+};*/
+
+/*
+ * Calls function to open drawer.
+ */
+exports.open_drawer = function(req, res) {
+	console.log('Opening Drawer.');
+	printer.printCommand(DRAWER_1_OPEN_CMD);
+	res.send("Opening cash drawer...");
+};
+
+/*
+ * Calls function to check the status of drawer (open/close).
+ * When printer is connected/online, it will detect the
+ * status of the drawer as always close.
+ */
+exports.check_drawer_status = function(req, res) {
+	console.log('Checking Drawer Status.');
+
+	var isDrawerClose = true;
+	var isOnline = false;
+
+	// escpos command to check printer status
+	printer.checkStatus(DRAWER_STATUS_CMD);
+
+	// return status from printer
+	printer.once('readStatus', function(data) {
+		var buffer = new Buffer(data);
+		console.log(data);
+		// read raw data as int value
+		buffer = buffer.readUInt8(0);
+		// convert raw data to binary
+		var binaryCode = decimalToBinary(buffer);
+		// log returned data of printer
+		console.log("Printer Status:" +binaryCode);
+		//offset 3 determines if printer/drawer is online
+		if (binaryCode[DRAWER_CONNECTION_OFFSET] == DRAWER_ON_LINE) {
+			isOnline = true;
+			if (binaryCode[DRAWER_STATUS_OFFSET] == DRAWER_OPEN_STATUS) {
+				isDrawerClose = false;
+				console.log(DRAWER_OPEN);
+			} else if(binaryCode[DRAWER_STATUS_OFFSET] == DRAWER_CLOSE_STATUS) {
+				isDrawerClose = true;
+				console.log(DRAWER_CLOSE);
+			}
+		}
+	});
+
+	// set timeout to wait for printer response;
+	setTimeout(function(){
+		console.log("isOnline: "+ isOnline);
+		console.log("isDrawerClose: "+ isDrawerClose);
+		if(isOnline){
+			sendResponse(res, 200, 'OK', 'application/json;charset=UTF-8'
+					, JSON.stringify({isClose : isDrawerClose}));
+		} else {
+			sendResponse(res, 400, 'Bad Request', 'application/json;charset=UTF-8'
+					, JSON.stringify({msg:DRAWER_ERROR}));
+		}
+	},200);
+};
+
+
+/**
+ * Sends response message back to POS.
+ * @param res
+ * @param statusCode
+ * @param statusMsg
+ * @param contentType
+ * @param body
+ */
+function sendResponse(res, statusCode, statusMsg, contentType, body) {
+	res.writeHead(statusCode, statusMsg, { 'Content-Type': contentType });
+	res.end(body);
+}
+
+// Convert raw data to binary
+decimalToBinary = function(d) {
+	var bits = 8;
+	var b = [];
+	for ( var i = 0; i < bits; i++) {
+		b.push(d % 2);
+		d = Math.floor(d / 2);
+	}
+	return b;
+};
+
+// Print format and execute escpos print commands.
+function printReceipt(txData) {
+	var printStatus = "Print Started.";
+<<<<<<< HEAD
+	if(global.configuration_poss.terminalType === 'HYPERCASH'){
+		//console.log('Printing for hypercash terminal');
+		// Check if txData is for printing
+		if(txData.isHypercashPrint){
+			//console.log('For hypercash thermal printer');
+			printerReceipt.printReceipt(txData, printer);
+		} else {
+			//console.log('ignore print');
+=======
+
+//	printer.printCommand(PRINT_SPEED);
+
+	try {
+		var hasFreeParking = !!txData['freeParking'];
+		var hasFooter      = !!txData['footer'];
+		var isReceiptEnd   = hasFooter || hasFreeParking;
+
+		// Header
+		if (txData['header']) {
+			printReceiptHeader(txData);
+		}
+
+		if (txData['title']) {
+			printReceiptTitle(txData);
+		}
+
+		// BODY
+		// Tx Sale Detail
+		if (txData['txDetail']) {
+			printReceiptDetails(txData);
+		}
+
+		// Tx items
+		if (txData['body']) {
+			printReceiptData(txData);
+		}
+
+		// Tx Summary Details
+		if (txData['summary']) {
+			printReceiptSummary(txData);
+		}
+
+		// TopUp Info Details
+		if (txData['topUpInfo']) {
+			printReceiptTopUpInfo(txData);
+		}
+
+		/* Contains the following which shouldn't be
+		 * MIDDLE aligned(as opposed to 'footer' section):
+		 *
+		 *
+		 * ..etcetera
+		 * QUANTITY PURCHASED
+		 *          VOIDED
+		 *          CANCELLED
+		 *          RETURNED
+		 *          REFUNDED
+		 * TOTAL DIRECT DISC
+		 */
+		if (txData['footerSummary']){
+			printReceiptFooterSummary(txData, hasFreeParking);
+		}
+
+		// Footer
+		if (txData['footer'] && !txData['footerSummary']) {
+			printReceiptFooter(txData, hasFreeParking);
+		}
+
+		//free parking
+		if (txData['freeParking'] && !txData['footerSummary']) {
+			printReceiptFreeParking(txData);
+		}
+
+		//eft online printing
+		if (txData['eftOnline'] && !txData['footerSummary']) {
+			printReceiptEftOnline(txData);
+		}
+
+		return printStatus;
+	} catch (err) {
+		console.log(err.message);
+		console.log("Unable to print receipt");
+		printStatus = "Unable to print receipt;";
+		return printStatus;
+	}
+}
+
+function printReceiptHeader(txData){
+	// Prints currency and prints separator for receipt body
+	for ( var h in txData.header) {
+		printer.printCentered(txData.header[h]);
+	}
+	receiptHeader = txData.header;
+}
+
+function printReceiptTitle(txData){
+	for ( var t in txData.title) {
+		printer.printCentered(txData.title[t]);
+	}
+}
+
+function printReceiptDetails(txData){
+	for ( var td in txData.txDetail) {
+		var currTxDetail = txData.txDetail[td];
+		printer.printCentered('******************************************');
+		for ( var tdItem in currTxDetail) {
+			printer.printCentered(currTxDetail[tdItem]);
+		}
+		printer.printCentered('******************************************');
+	}
+	receiptDetails = txData.txDetail;
+}
+
+function printReceiptData(txData){
+	for ( var item in txData.body) {
+		for ( var i in txData.body[item]) {
+			printer.printLine(txData.body[item][i]);
+		}
+	}
+	receiptBody = txData.body;
+}
+
+function printReceiptSummary(txData){
+	
+	for ( var item in txData.summary) {
+		if(txData.summary[item]['position']){
+			printItem(txData.summary[item]['position'], txData.summary[item]['val']);
+		}else{
+			printer.printLine(txData.summary[item]);
+		}
+	}
+}
+
+function printReceiptTopUpInfo(txData){
+	for ( var item in txData.topUpInfo) {
+		printer.printLine(txData.topUpInfo[item]);
+	}
+}
+
+/*
+ * Print receipt summary footer
+ * Create delay on the printing
+ */
+function printReceiptFooterSummary(txData, hasFreeParking){
+	var footerSummaryInterval;
+	var x = 0, timeout = 0;
+	footerSummaryInterval = setInterval(function(){
+		for(var i in txData.footerSummary[x]){
+			if(i == 'position'){
+				printItem(txData.footerSummary[x][i], txData.footerSummary[x].val);
+			}
+		}
+		x++;
+		timeout += 300;
+		if(x === (txData.footerSummary).length ){
+			clearInterval(footerSummaryInterval);
+			setTimeout(function(){
+				continuePrintingReceipt(txData, hasFreeParking);
+			}, timeout/2);
+		}
+	}, 300);
+}
+
+function continuePrintingReceipt(txData, hasFreeParking){
+	if (txData['footer']) {
+		printReceiptFooter(txData, hasFreeParking);
+	}
+
+	//free parking
+	if (txData['freeParking']) {
+		printReceiptFreeParking(txData);
+	}
+
+	//eft online printing
+	if (txData['eftOnline']) {
+		printReceiptEftOnline(txData);
+	}
+
+	if(txData['isInstallmentTransaction']){
+		printCounter++;
+		if(printCounter == 1){
+			
+			var lineCount = 0;
+			for(var i in txData){
+				if(i != 'isInstallmentTransaction'){
+					lineCount += txData[i].length;
+				}
+			}
+			
+			txData.header = txData['isInstallmentTransaction']['header'];
+			txData.title = new Array("DUPLICATE RECEIPT");
+			txData.txDetail = txData['isInstallmentTransaction']['txDetail'];
+			txData.body = txData['isInstallmentTransaction']['body'];
+			txData.summary = txData['isInstallmentTransaction']['summary'];
+			txData.footerSummary = txData['isInstallmentTransaction']['footerSummary'];
+			txData.footer = txData['isInstallmentTransaction']['footer'];
+			txData.freeParking = null;
+//			printReceipt(txData);
+			
+			var printDelay = 700+(lineCount*140);
+			setTimeout(function(){
+				printReceipt(txData);
+			}, printDelay);
+		}
+	}
+}
+
+function printReceiptFooter(txData, hasFreeParking){
+	for ( var f in txData.footer) {
+		printer.printCentered(txData.footer[f]);
+	}
+
+	if(hasFreeParking){
+		printer.printCentered('\n');
+	}else{
+		printer.printCentered('\n');
+		printer.printCentered('\n');
+		printer.printCentered('\n');
+		printer.printCentered('\n');
+		printer.printCentered('\n');
+		printer.printCommand(PAPER_FULL_CUT);
+	}
+}
+
+function printReceiptFreeParking(txData){
+	var counter = 0;
+	for (var i in txData.freeParking) {
+		if(counter == 8)
+			printer.printCommand(PAPER_PART_CUT);
+		printer.printCentered(txData.freeParking[i]);
+		counter++;
+	}
+	printer.printCentered('\n');
+	printer.printCentered('\n');
+	printer.printCentered('\n');
+	printer.printCentered('\n');
+	printer.printCommand(PAPER_FULL_CUT);
+}
+
+function printReceiptEftOnline(txData){
+	printer.printCommand(PAPER_FULL_CUT);
+	for(var ctr = 0; ctr < (txData.eftOnline).length; ctr ++){
+		for(var i in txData.eftOnline[ctr]){
+			if(i == 'position'){
+				printItem(txData.eftOnline[ctr][i], txData.eftOnline[ctr].val);
+			}
+>>>>>>> 1.4-snapshot
+		}
+	} else {
+		//console.log('Printing for non-hypercash');
+		printerReceipt.printReceipt(txData, printer);
+	}
+	return printStatus;
+//	printer.printCommand(PRINT_SPEED);
+}
+
+//Print on document
+function printDocument(txData) {
+	var printStatus = "Print document Started.";
+	try {
+		//turn on the document printing
+		printer.printCommand("\x1b\x63\x30\x04");
+		printer.printLine("\n");
+		printer.printLine("\n");
+		printer.printLine("\n");
+		printer.printLine("\n");
+		for(var i in txData){
+			printer.printLine("   "+txData[i]);;
+		}
+		//turn off doc print mode and switch to 2-sheet mode
+		printer.printCommand("\x0c");
+	} catch (err) {
+		console.log("Unable to print document");
+		console.log(err.message);
+		printStatus = "Unable to print document;";
+		return printStatus;
+	}
+}
+
+function printDocumentTest(txData){
+	var printStatus = "Document Printed.";
+	try {
+		console.log("\n");
+		console.log("\n");
+		console.log("\n");
+		console.log("\n");
+		for(var i in txData){
+			console.log(txData[i]);
+		}
+	} catch (err) {
+		console.log("Unable to print document");
+		console.log(err.message);
+		printStatus = "Unable to print document;";
+		return printStatus;
+	}
+}
+
+// Create a uniform padded space of product and price
+var padProductDetails = function(txt, lineWidth) {
+	var pad = "";
+	if (txt.length < lineWidth) {
+		var nbSpaces = lineWidth - txt.length;
+		for ( var i = 0; i < nbSpaces; i++) {
+			pad += " ";
+		}
+		return pad;
+	} else {
+		return txt;
+	}
+};
+
+// Log Print Test
+function printTest(txData) {
+	var printStatus = "Receipt Printed.";
+	try {
+
+		var hasFreeParking = !!txData['freeParking'];
+		var hasFooter      = !!txData['footer'];
+		var isReceiptEnd   = hasFooter || hasFreeParking;
+
+		// Header
+		if (txData['header']) {
+			for ( var h in txData.header) {
+				console.log(txData.header[h]);
+			}
+			// Prints currency and separator of receipt body
+		}
+
+		if (txData['title']) {
+			for ( var t in txData.title) {
+				console.log(txData.title[t]);
+			}
+		}
+
+		// BODY
+		// Tx Sale Details
+		if (txData['txDetail']) {
+			for ( var td in txData.txDetail) {
+				var currTxDetail = txData.txDetail[td];
+				console.log('******************************************');
+				for ( var tdItem in currTxDetail) {
+					console.log(currTxDetail[tdItem]);
+				}
+				console.log('******************************************');
+			}
+		}
+
+		// Tx items
+		if (txData['body']) {
+			for ( var item in txData.body) {
+				for ( var i in txData.body[item]) {
+					console.log(txData.body[item][i]);
+				}
+			}
+		}
+
+		// Tx Summary Details
+		if (txData['summary']) {
+			for ( var item in txData.summary) {
+				if(txData.summary[item]['position']){
+					console.log(txData.summary[item]['val']);
+				}else{
+					console.log(txData.summary[item]);
+				}
+			}
+		}		
+
+		// TopUp Info Details
+		if (txData['topUpInfo']) {
+			for ( var item in txData.topUpInfo) {
+				console.log(txData.topUpInfo[item]);
+			}
+		}
+
+		/* Contains the following which shouldn't be
+		 * MIDDLE aligned(as opposed to 'footer' section):
+		 *
+		 *
+		 * ..etcetera
+		 * QUANTITY PURCHASED
+		 *          VOIDED
+		 *          CANCELLED
+		 *          RETURNED
+		 *          REFUNDED
+		 * TOTAL DIRECT DISC
+		 */
+
+		if (txData['footerSummary']){
+			for(var ctr = 0; ctr < (txData.footerSummary).length; ctr ++){
+				for(var i in txData.footerSummary[ctr]){
+					if(i == 'position'){
+						console.log(txData.footerSummary[ctr].val);
+					}
+				}
+			}
+		}
+
+		// Footer
+		if (txData['footer']) {
+			for ( var f in txData.footer) {
+				console.log(txData.footer[f]);
+			}
+
+			if(hasFreeParking){
+				console.log(' ');
+			}else{
+				console.log(' ');
+				console.log(' ');
+				console.log(' ');
+				console.log(' ');
+				console.log(' ');
+				console.log('PAPER_FULL_CUT');
+			}
+		}
+
+		//free parking
+		if (txData['freeParking']) {
+			var counter = 0;
+			for (var i in txData.freeParking) {
+				if(counter == 8)
+					console.log('PAPER_FULL_CUT');
+				console.log(txData.freeParking[i]);
+				counter++;
+			}
+			console.log(' ');
+			console.log(' ');
+			console.log(' ');
+			console.log(' ');
+			console.log('PAPER_FULL_CUT');
+		}
+
+		//eft online printing
+		if (txData['eftOnline']) {
+			console.log('PAPER_FULL_CUT');
+			for(var ctr = 0; ctr < (txData.eftOnline).length; ctr ++){
+				for(var i in txData.eftOnline[ctr]){
+					if(i == 'position'){
+						console.log(txData.eftOnline[ctr].val);
+					}
+				}
+			}
+
+			console.log(' ');
+			console.log(' ');
+			console.log(' ');
+			console.log(' ');
+			console.log('PAPER_FULL_CUT');
+		}
+
+		if(txData['isInstallmentTransaction']){
+			printTestCounter++;
+			if(printTestCounter == 1){
+				txData.header = txData['isInstallmentTransaction']['header'];
+				txData.title = new Array("DUPLICATE RECEIPT");
+				txData.txDetail = txData['isInstallmentTransaction']['txDetail'];
+				txData.body = txData['isInstallmentTransaction']['body'];
+				txData.summary = txData['isInstallmentTransaction']['summary'];
+				txData.footerSummary = txData['isInstallmentTransaction']['footerSummary'];
+				txData.footer = txData['isInstallmentTransaction']['footer'];
+				printTest(txData);
+			}
+		}
+
+		return printStatus;
+	} catch (err) {
+		console.log("Unable to print receipt");
+		console.log(err.message);
+		printStatus = "Unable to print receipt;";
+		return printStatus;
+	}
+}
+
